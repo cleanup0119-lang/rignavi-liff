@@ -1,65 +1,77 @@
 <!doctype html><html lang="ja"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RigNavi</title>
-<!-- キャッシュ抑止（GitHub Pagesでも効く範囲で） -->
+
+<!-- LIFF SDK -->
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<!-- できるだけキャッシュを抑止 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* 明るめ配色 */
-  --bg1:#f5f9ff; --bg2:#eef6ff;
-  --card:#ffffff; --line:#d9e6f6;
-  --txt:#0b1b2b; --muted:#506172;
-  --pri:#0ea5e9; --pri2:#22d3ee; --shadow:0 6px 18px rgba(13,97,160,.12);
+  /* ── 海っぽいダークテーマ ───────────────────────── */
+  --bg1:#071a2b; --bg2:#0b2742;             /* 背景グラデ */
+  --card:#0f2f4a;                           /* カード紺 */
+  --line:#1a4266;                           /* 枠線 */
+  --txt:#e9f4ff;                            /* 文字（明） */
+  --muted:#b9d3e7;                          /* 補助文字 */
+  --pri:#22d3ee; --pri2:#3b82f6;            /* アクア系アクセント */
+  --shadow:0 10px 26px rgba(5,42,75,.28);
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Helvetica,Arial;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:var(--txt);}
-.container{max-width:900px;margin:0 auto;padding:18px}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;color:var(--txt);
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  font-family:system-ui, -apple-system, "Segoe UI", Helvetica, Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+}
+a{color:inherit}
+.container{max-width:980px;margin:0 auto;padding:18px}
+
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.brand{font-weight:700;letter-spacing:.2px}
-.badge{color:#003244;background:linear-gradient(90deg,var(--pri),var(--pri2));
-  padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.brand{font-weight:800;letter-spacing:.2px}
+.badge{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#022436;
+  padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800}
+
 .hello{color:var(--muted);margin:2px 0 14px}
 
-.stepper{display:flex;gap:10px;margin:8px 0 16px}
-.step{flex:1;background:#fff;border:1px solid var(--line);color:var(--muted);
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.step{background:var(--card);border:1px solid var(--line);color:var(--muted);
   padding:10px 12px;border-radius:12px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow)}
-.step.active{border-color:var(--pri); color:#024c66;
-  background:linear-gradient(180deg,#ffffff,#f0fbff)}
-.step .num{width:22px;height:22px;border-radius:999px;background:#eef7ff;
-  display:grid;place-items:center;font-size:12px;color:#0678a3;font-weight:700}
+.step.active{border-color:var(--pri); color:#d9f7ff; background:linear-gradient(180deg,#123756,#0f2f4a)}
+.step .num{width:22px;height:22px;border-radius:999px;background:#0d3d61;
+  display:grid;place-items:center;font-size:12px;color:#aeeaff;font-weight:800}
 
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media(min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
   padding:14px;box-shadow:var(--shadow);transition:.15s transform}
 .card:hover{transform:translateY(-2px)}
 .card h3{margin:0 0 6px;font-size:16px}
 .card p{margin:0;color:var(--muted);font-size:13px}
+.small{font-size:12px;color:var(--muted)}
 
-.chip{display:inline-block;padding:6px 10px;border-radius:999px;
-  background:#e6f7ff;border:1px solid #bfeaff;color:#06678e;font-size:12px}
-.btn{background:linear-gradient(90deg,var(--pri),var(--pri2));border:none;color:#003244;
-  font-weight:700;padding:12px 14px;border-radius:10px;box-shadow:var(--shadow)}
-.btn.secondary{background:#ffffff;color:#0b1b2b;border:1px solid var(--line)}
+.tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#0d3d61;color:#c9eeff;font-size:12px}
+.btn{background:linear-gradient(90deg,var(--pri),var(--pri2));border:none;color:#022436;
+  font-weight:800;padding:12px 14px;border-radius:10px;box-shadow:var(--shadow);cursor:pointer}
+.btn.secondary{background:#0e3c61;color:#e9f4ff;border:1px solid var(--line)}
 
 .section{background:var(--card);border:1px solid var(--line);border-radius:16px;
   padding:16px;box-shadow:var(--shadow)}
 .section h2{margin:0 0 10px}
 
 .row{display:flex;gap:10px;flex-wrap:wrap}
-.item{flex:1 1 240px;border:1px dashed #b9d6ea;border-radius:10px;padding:10px;background:#fcfeff}
-a.clean{color:inherit;text-decoration:none}
-.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-.small{font-size:12px;color:var(--muted)}
+.item{flex:1 1 240px;border:1px dashed #2a567a;border-radius:10px;padding:10px;background:#0d2a44}
 .hero{width:100%;border-radius:12px;margin:6px 0;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--line)}
+
+.input{width:100%;background:#0d2a44;border:1px solid var(--line);color:var(--txt);
+  padding:10px 12px;border-radius:10px;outline:none}
+.search{display:flex;gap:8px;margin-bottom:10px}
 </style>
 </head><body>
 <div class="container">
@@ -70,159 +82,321 @@ a.clean{color:inherit;text-decoration:none}
   <div id="hello" class="hello">起動中...</div>
 
   <div class="stepper">
-    <div class="step" id="s1"><span class="num">1</span>釣り場所</div>
-    <div class="step" id="s2"><span class="num">2</span>魚種</div>
-    <div class="step" id="s3"><span class="num">3</span>釣り方</div>
+    <div class="step" id="st1"><span class="num">1</span>釣り場所</div>
+    <div class="step" id="st2"><span class="num">2</span>釣りポイント</div>
+    <div class="step" id="st3"><span class="num">3</span>魚種</div>
+    <div class="step" id="st4"><span class="num">4</span>釣り方</div>
   </div>
 
   <div id="view"></div>
 </div>
 
 <script>
-const LIFF_ID   = "2008257307-RwPLYWG1";
-const VERSION   = "2";  // ←デプロイのたびに上げる
-const LIFF_URL  = `https://liff.line.me/${LIFF_ID}?v=${VERSION}`;
+/* ========== 基本設定（必要時だけ編集） ========== */
+const LIFF_ID = "2008257307-RwPLYWG1";
+const VERSION = "3"; // ←公開のたびに上げる（キャッシュ更新）
+const LIFF_URL = `https://liff.line.me/${LIFF_ID}?v=${VERSION}`;
 
-// --- データ（必要に応じて増やしてください） ---
+/* ========== データ ========== */
+/* 釣り場所 → 釣りポイント → 魚種 → 釣り方 → 推奨プラン */
 const DB = [
-  { id:"teibo", name:"港・堤防", desc:"常夜灯や角地、外向きテトラなど",
-    fishes:[
-      { id:"aji", name:"アジ", desc:"夕まずめ〜夜の回遊",
-        methods:[
-          { id:"sabiki", name:"サビキ",
-            plan:{
-              title:"アジの数釣り（堤防サビキ）",
-              hero:"https://images.unsplash.com/photo-1524712245354-c8471b98e76c?q=80&w=1200&auto=format&fit=crop",
-              point:"常夜灯の明暗境・足元回遊の表層〜中層",
-              depth:"表層〜中層（カゴを1m刻みで探る）",
-              how:"10回/分のテンポで上下。群れが付いた層をキープ。",
-              gear:{ rig:"サビキ6本 4〜6号 + 小型カゴ", line:"ナイロン2〜3号 / ハリス1.5号", option:"夜はケミ小で視認性UP" },
-              parts:[
-                {label:"ハヤブサ サビキ5号", url:"https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%93%E3%82%AD+5%E5%8F%B7&tag=yourtag-22"},
-                {label:"カゴ小 ナス型8号", url:"https://www.amazon.co.jp/s?k=%E9%87%A3%E3%82%8A+%E3%82%AB%E3%82%B4+%E5%B0%8F&tag=yourtag-22"}
-              ]
-            }
+  {
+    id:"daikoku",
+    name:"大黒釣り公園",
+    address:"神奈川県横浜市鶴見区 大黒ふ頭",
+    map:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("大黒釣り公園"),
+    types:[
+      {
+        id:"teibo", name:"堤防", desc:"足場良好・常夜灯あり",
+        fishes:[
+          {
+            id:"aji", name:"アジ",
+            methods:[
+              { id:"sabiki", name:"サビキ", plan:{
+                title:"足元の回遊で数釣り（堤防サビキ）",
+                hero:"https://images.unsplash.com/photo-1524712245354-c8471b98e76c?q=80&w=1200&auto=format&fit=crop",
+                point:"常夜灯の明暗境・足元回遊の筋",
+                depth:"表層〜中層（1m刻みで探る）",
+                how:"10回/分くらいのテンポで上下。群れが付いた層をキープ。",
+                gear:{ rig:"サビキ 4〜6号 + 小型カゴ", line:"ナイロン2〜3号 / ハリス1.5号", option:"夜はケミで視認性UP" },
+                parts:[
+                  {label:"サビキ仕掛け 5号", url:"https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%93%E3%82%AD+5%E5%8F%B7&tag=yourtag-22"},
+                  {label:"カゴ小 + ナス型8号", url:"https://www.amazon.co.jp/s?k=%E9%87%A3%E3%82%8A+%E3%82%AB%E3%82%B4+%E5%B0%8F&tag=yourtag-22"}
+                ]
+              }},
+              { id:"uki", name:"ウキ", plan:{
+                title:"電気ウキで回遊待ち",
+                hero:"https://images.unsplash.com/photo-1508855901852-97c5b3b5b6cd?q=80&w=1200&auto=format&fit=crop",
+                point:"常夜灯周辺の潮が効く筋",
+                depth:"1.0〜1.8mを微調整",
+                how:"時々ゆっくり引いて誘い。アタリ層を30cm刻みで。",
+                gear:{ rig:"電気ウキ 0.5〜1号", line:"ナイロン3号", option:"ガン玉G5" },
+                parts:[
+                  {label:"電気ウキ 1号", url:"https://www.amazon.co.jp/s?k=%E9%9B%BB%E6%B0%97%E3%82%A6%E3%82%AD+1%E5%8F%B7&tag=yourtag-22"},
+                  {label:"サルカン/ハリス", url:"https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%AB%E3%82%AB%E3%83%B3+%E3%83%8F%E3%83%AA%E3%82%B9&tag=yourtag-22"}
+                ]
+              }}
+            ]
           },
-          { id:"uki", name:"ウキ",
-            plan:{
-              title:"電気ウキで回遊待ち",
-              hero:"https://images.unsplash.com/photo-1508855901852-97c5b3b5b6cd?q=80&w=1200&auto=format&fit=crop",
-              point:"常夜灯周辺の潮が効く筋",
-              depth:"1.0〜1.8mで微調整",
-              how:"ウキ下を30cm刻みで調整。時々ゆっくり引く。",
-              gear:{ rig:"電気ウキ0.5〜1号", line:"ナイロン3号", option:"誘い用ガン玉G5" },
-              parts:[
-                {label:"電気ウキ 1号", url:"https://www.amazon.co.jp/s?k=%E9%9B%BB%E6%B0%97%E3%82%A6%E3%82%AD+1%E5%8F%B7&tag=yourtag-22"},
-                {label:"サルカン/ハリス", url:"https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%AB%E3%82%AB%E3%83%B3+%E3%83%8F%E3%83%AA%E3%82%B9&tag=yourtag-22"}
-              ]
-            }
+          {
+            id:"mebaru", name:"メバル",
+            methods:[
+              { id:"lure", name:"ルアー", plan:{
+                title:"常夜灯メバリング（ジグ単）",
+                hero:"https://images.unsplash.com/photo-1558981285-6f0c94958bb6?q=80&w=1200&auto=format&fit=crop",
+                point:"岸壁際、明暗境、反転流",
+                depth:"表層ドリフト → 中層レンジキープ",
+                how:"1gジグヘッド＋1.5inワームを超スロー巻き",
+                gear:{ rig:"1gジグヘッド＋1.5inワーム", line:"PE0.2 + ﾌﾛﾛ0.8", option:"スナップ小で交換楽に" },
+                parts:[
+                  {label:"ジグヘッド1g", url:"https://www.amazon.co.jp/s?k=%E3%82%B8%E3%82%B0%E3%83%98%E3%83%83%E3%83%89+1g&tag=yourtag-22"},
+                  {label:"メバルワーム1.5in", url:"https://www.amazon.co.jp/s?k=%E3%83%A1%E3%83%90%E3%83%AA+%E3%83%AF%E3%83%BC%E3%83%A0&tag=yourtag-22"}
+                ]
+              }}
+            ]
           }
         ]
       },
-      { id:"mebaru", name:"メバル", desc:"岩場・ストラクチャー周り",
-        methods:[
-          { id:"lure", name:"ルアー",
-            plan:{
-              title:"常夜灯メバリング",
-              hero:"https://images.unsplash.com/photo-1558981285-6f0c94958bb6?q=80&w=1200&auto=format&fit=crop",
-              point:"壁際/明暗境/反転流",
-              depth:"表層ドリフト → 中層レンジキープ",
-              how:"1gジグヘッド＋ワームで超スロー巻き",
-              gear:{ rig:"1gジグヘッド＋1.5inワーム", line:"PE0.2 + ﾌﾛﾛ0.8", option:"スナップ小で交換楽に" },
-              parts:[
-                {label:"1g ジグヘッド", url:"https://www.amazon.co.jp/s?k=%E3%82%B8%E3%82%B0%E3%83%98%E3%83%83%E3%83%89+1g&tag=yourtag-22"},
-                {label:"メバルワーム1.5in", url:"https://www.amazon.co.jp/s?k=%E3%83%A1%E3%83%90%E3%83%AA+%E3%83%AF%E3%83%BC%E3%83%A0&tag=yourtag-22"}
-              ]
-            }
+      {
+        id:"tetra", name:"テトラ", desc:"根回り・スリット狙い",
+        fishes:[
+          { id:"kasago", name:"カサゴ",
+            methods:[
+              { id:"burakuri", name:"ブラクリ", plan:{
+                title:"穴撃ちで根魚攻略",
+                hero:"https://images.unsplash.com/photo-1471864190281-a93a3070b6de?q=80&w=1200&auto=format&fit=crop",
+                point:"テトラの隙間・落ち込み",
+                depth:"ボトム〜30cm上",
+                how:"穴に落として3〜5秒待ち→小さく誘い上げ",
+                gear:{ rig:"ブラクリ2〜4号 + 青イソ/オキアミ", line:"フロロ3〜4号", option:"根ズレ対策でリーダー長め" },
+                parts:[
+                  {label:"ブラクリ3号", url:"https://www.amazon.co.jp/s?k=%E3%83%96%E3%83%A9%E3%82%AF%E3%83%AA&tag=yourtag-22"},
+                  {label:"フロロカーボン 4号", url:"https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%AD+4%E5%8F%B7&tag=yourtag-22"}
+                ]
+              }}
+            ]
           }
         ]
       }
     ]
   },
-  { id:"surf", name:"サーフ", desc:"遠浅の砂浜。払い出し/離岸流が狙い目",
-    fishes:[
-      { id:"hirame", name:"ヒラメ", desc:"朝夕まずめ中心",
-        methods:[ { id:"lure", name:"ルアー",
-          plan:{
-            title:"フラットゲーム（ミノー/シンペン）",
-            hero:"https://images.unsplash.com/photo-1455216205476-8e8b3410dde6?q=80&w=1200&auto=format&fit=crop",
-            point:"離岸流のヨレ・地形変化ライン",
-            depth:"中層〜ボトム付近",
-            how:"ただ巻き＋時々ストップ。波打ち際まで通す。",
-            gear:{ rig:"30gシンペン/ミノー", line:"PE1.0 + ﾌﾛﾛ4", option:"スナップ#1" },
-            parts:[
-              {label:"シンペン 30g", url:"https://www.amazon.co.jp/s?k=%E3%82%B7%E3%83%B3%E3%83%9A%E3%83%B3+30g&tag=yourtag-22"},
-              {label:"ショックリーダー4号", url:"https://www.amazon.co.jp/s?k=%E3%83%AA%E3%83%BC%E3%83%80%E3%83%BC+4%E5%8F%B7+%E3%83%95%E3%83%AD%E3%83%AD&tag=yourtag-22"}
+
+  {
+    id:"toushima-nishi",
+    name:"東扇島西公園",
+    address:"神奈川県川崎市川崎区 東扇島",
+    map:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("東扇島西公園"),
+    types:[
+      { id:"teibo", name:"堤防", desc:"広い直線護岸",
+        fishes:[
+          { id:"saba", name:"サバ",
+            methods:[
+              { id:"float", name:"カゴ遠投", plan:{
+                title:"朝夕の回遊を広範囲に探る",
+                hero:"https://images.unsplash.com/photo-1508161773455-3ada8ed2bbd9?q=80&w=1200&auto=format&fit=crop",
+                point:"潮目・ナブラ・表層回遊",
+                depth:"表層〜中層",
+                how:"ウキ止めで層調整。早巻きでリアクション誘発。",
+                gear:{ rig:"遠投カゴ + 3号ナイロン", line:"ナイロン3号", option:"メタルジグ20〜30gでもOK" },
+                parts:[
+                  {label:"遠投カゴセット", url:"https://www.amazon.co.jp/s?k=%E9%81%A0%E6%8A%95+%E3%82%AB%E3%82%B4&tag=yourtag-22"},
+                  {label:"メタルジグ30g", url:"https://www.amazon.co.jp/s?k=%E3%83%A1%E3%82%BF%E3%83%AB%E3%82%B8%E3%82%B0+30g&tag=yourtag-22"}
+                ]
+              }}
+            ]
+          },
+          { id:"seabass", name:"シーバス",
+            methods:[
+              { id:"lure", name:"ルアー", plan:{
+                title:"常夜灯周りの回遊待ち（ミノー）",
+                hero:"https://images.unsplash.com/photo-1487956382158-bb926046304a?q=80&w=1200&auto=format&fit=crop",
+                point:"明暗境・岸壁際の反転流",
+                depth:"表層〜中層",
+                how:"ただ巻き＋トゥイッチでスイッチON",
+                gear:{ rig:"9cmクラスのミノー", line:"PE1.0 + ﾌﾛﾛ4", option:"スナップ#1" },
+                parts:[
+                  {label:"ミノー 9cm", url:"https://www.amazon.co.jp/s?k=%E3%83%9F%E3%83%8E%E3%83%BC+9cm&tag=yourtag-22"},
+                  {label:"ショックリーダー4号", url:"https://www.amazon.co.jp/s?k=%E3%83%AA%E3%83%BC%E3%83%80%E3%83%BC+4%E5%8F%B7&tag=yourtag-22"}
+                ]
+              }}
             ]
           }
-        } ]
+        ]
+      },
+      { id:"kawaguchi", name:"河口付近", desc:"流心とヨレ",
+        fishes:[
+          { id:"kurodai", name:"クロダイ",
+            methods:[
+              { id:"feed", name:"落とし込み", plan:{
+                title:"壁際ドリフトでクロダイ狙い",
+                hero:"https://images.unsplash.com/photo-1544551763-7ef25f88c5f5?q=80&w=1200&auto=format&fit=crop",
+                point:"ケーソン継ぎ目・障害物周り",
+                depth:"表層〜1m",
+                how:"エサを流れに同調。送り込み過ぎに注意。",
+                gear:{ rig:"落とし込み仕掛け", line:"PE1.2 + ﾌﾛﾛ3", option:"ガン玉で沈下速度調整" },
+                parts:[
+                  {label:"チヌ針2号", url:"https://www.amazon.co.jp/s?k=%E3%83%81%E3%83%8C%E9%87%A3%E3%82%8A+%E9%87%9D&tag=yourtag-22"},
+                  {label:"ガン玉 G5", url:"https://www.amazon.co.jp/s?k=%E3%82%AC%E3%83%B3%E7%8E%89+G5&tag=yourtag-22"}
+                ]
+              }}
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id:"kemigawa",
+    name:"検見川西突堤",
+    address:"千葉県千葉市美浜区 磯辺",
+    map:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("検見川 西突堤"),
+    types:[
+      { id:"teibo", name:"堤防", desc:"外洋向き先端が狙い目",
+        fishes:[
+          { id:"aji", name:"アジ", methods:[
+            { id:"sabiki", name:"サビキ", plan:{
+              title:"夕まずめの回遊で手返し勝負",
+              hero:"https://images.unsplash.com/photo-1517999349371-c43520457b23?q=80&w=1200&auto=format&fit=crop",
+              point:"先端の潮通し・常夜灯周り",
+              depth:"表層〜中層",
+              how:"足元と軽い投げをローテ。",
+              gear:{ rig:"サビキ 5号 + カゴ", line:"ナイロン2〜3号", option:"集魚板で寄せ強化" },
+              parts:[
+                {label:"サビキ5号", url:"https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%93%E3%82%AD+5%E5%8F%B7&tag=yourtag-22"},
+                {label:"集魚板", url:"https://www.amazon.co.jp/s?k=%E9%9B%86%E9%AD%9A%E6%9D%BF&tag=yourtag-22"}
+              ]
+            }}
+          ] }
+        ]
+      },
+      { id:"surf", name:"サーフ", desc:"遠浅の砂浜・離岸流",
+        fishes:[
+          { id:"hirame", name:"ヒラメ", methods:[
+            { id:"lure", name:"ルアー", plan:{
+              title:"ミノー/シンペンでフラット狙い",
+              hero:"https://images.unsplash.com/photo-1455216205476-8e8b3410dde6?q=80&w=1200&auto=format&fit=crop",
+              point:"離岸流のヨレと地形変化ライン",
+              depth:"中層〜ボトム",
+              how:"ただ巻き＋時々ストップ。波打ち際まで通す。",
+              gear:{ rig:"30gシンペン/ミノー", line:"PE1.0 + ﾌﾛﾛ4", option:"スナップ#1" },
+              parts:[
+                {label:"シンペン30g", url:"https://www.amazon.co.jp/s?k=%E3%82%B7%E3%83%B3%E3%83%9A%E3%83%B3+30g&tag=yourtag-22"},
+                {label:"リーダー4号", url:"https://www.amazon.co.jp/s?k=%E3%83%AA%E3%83%BC%E3%83%80%E3%83%BC+4%E5%8F%B7+%E3%83%95%E3%83%AD%E3%83%AD&tag=yourtag-22"}
+              ]
+            }}
+          ] }
+        ]
       }
     ]
   }
 ];
 
-// ====== 状態 & ルーティング ======
-let state = {spot:null, fish:null, method:null};
-function setState(part, val){
-  state[part] = val;
-  const hash = [state.spot?.id, state.fish?.id, state.method?.id].filter(Boolean).join('/');
-  location.hash = hash ? `#${hash}` : '#';
+/* ========== 状態 & ルーティング（場所/ポイント/魚種/釣り方） ========== */
+let state = { place:null, type:null, fish:null, method:null };
+
+function setState(key,val){
+  state[key] = val;
+  // 下位はクリア
+  if(key==="place"){ state.type = state.fish = state.method = null; }
+  if(key==="type"){  state.fish = state.method = null; }
+  if(key==="fish"){  state.method = null; }
+  // ハッシュに同期（深いリンク可）
+  const hash = [state.place?.id,state.type?.id,state.fish?.id,state.method?.id].filter(Boolean).join("/");
+  location.hash = hash?("#"+hash):"#";
   render();
 }
+
 function initFromHash(){
-  const [sid,fid,mid] = (location.hash.replace('#','')||'').split('/');
-  const spot   = DB.find(s=>s.id===sid);
-  const fish   = spot?.fishes.find(f=>f.id===fid);
-  const method = fish?.methods.find(m=>m.id===mid);
-  state = {spot, fish, method};
+  const [pid,tid,fid,mid] = (location.hash.replace("#","")||"").split("/");
+  const place = DB.find(p=>p.id===pid);
+  const type  = place?.types.find(t=>t.id===tid);
+  const fish  = type?.fishes.find(f=>f.id===fid);
+  const method= fish?.methods.find(m=>m.id===mid);
+  state = {place,type,fish,method};
 }
 
-// ====== ビュー ======
-const $view = document.getElementById('view');
-function stepActive(n){ [1,2,3].forEach(i=>document.getElementById('s'+i).classList.toggle('active', i===n)); }
+/* ========== ビュー ========== */
+const $view = document.getElementById("view");
 
-function viewSpots(){
+function stepActive(n){ [1,2,3,4].forEach(i=>document.getElementById('st'+i).classList.toggle('active', i===n)); }
+
+function viewPlaces(){
   stepActive(1);
-  $view.innerHTML = `<div class="grid">
-    ${DB.map(s=>`<a class="clean" href="javascript:void(0)" onclick="pickSpot('${s.id}')">
-      <div class="card"><h3>${s.name}</h3><p>${s.desc}</p></div></a>`).join('')}
+  $view.innerHTML = `
+  <div class="section">
+    <h2>釣り場所を選ぶ</h2>
+    <div class="search"><input id="q" class="input" placeholder="場所名や地域で検索（例: 大黒, 検見川, 川崎）"></div>
+    <div class="grid" id="placeGrid"></div>
+  </div>`;
+  const $grid = document.getElementById('placeGrid');
+  const draw = (list)=> $grid.innerHTML = list.map(p=>`
+    <div class="card">
+      <h3>${p.name}</h3>
+      <p class="small">住所：${p.address}</p>
+      <div style="display:flex; gap:8px; margin-top:10px">
+        <button class="btn" onclick="pickPlace('${p.id}')">この場所を選ぶ</button>
+        <button class="btn secondary" onclick="openMap('${p.id}')">地図を開く</button>
+      </div>
+    </div>`).join("");
+  draw(DB);
+  document.getElementById('q').oninput = (e)=>{
+    const q = e.target.value.trim();
+    if(!q) return draw(DB);
+    const list = DB.filter(p=> (p.name+p.address).includes(q));
+    draw(list);
+  };
+}
+
+function viewTypes(){
+  stepActive(2);
+  const list = state.place.types;
+  $view.innerHTML = `<div class="section">
+    <h2>${state.place.name} <span class="tag">釣りポイントを選ぶ</span></h2>
+    <div class="grid">
+      ${list.map(t=>`<div class="card">
+        <h3>${t.name}</h3><p>${t.desc||""}</p>
+        <div style="margin-top:8px"><button class="btn" onclick="pickType('${t.id}')">選択</button></div>
+      </div>`).join("")}
+    </div>
+    <div class="small" style="margin-top:10px">戻る: <a href="javascript:setState('place',null)">場所一覧</a></div>
   </div>`;
 }
-window.pickSpot = (sid)=>{ setState('spot', DB.find(s=>s.id===sid)); setState('fish',null); setState('method',null); };
 
 function viewFish(){
-  stepActive(2);
-  const list = state.spot.fishes;
+  stepActive(3);
+  const list = state.type.fishes;
   $view.innerHTML = `<div class="section">
-    <h2>${state.spot.name} <span class="chip">魚種を選ぶ</span></h2>
-    <div class="grid" style="margin-top:10px;">
-      ${list.map(f=>`<a class="clean" href="javascript:void(0)" onclick="pickFish('${f.id}')">
-        <div class="card"><h3>${f.name}</h3><p>${f.desc}</p></div></a>`).join('')}
+    <h2>${state.place.name} › ${state.type.name} <span class="tag">魚種を選ぶ</span></h2>
+    <div class="grid">
+      ${list.map(f=>`<div class="card">
+        <h3>${f.name}</h3><p class="small">${state.type.desc||""}</p>
+        <div style="margin-top:8px"><button class="btn" onclick="pickFish('${f.id}')">選択</button></div>
+      </div>`).join("")}
     </div>
-    <div class="small" style="margin-top:10px">戻る: <a class="clean mono" href="javascript:setState('spot',null)">#TOP</a></div>
   </div>`;
 }
-window.pickFish = (fid)=>{ setState('fish', state.spot.fishes.find(f=>f.id===fid)); setState('method',null); };
 
 function viewMethods(){
-  stepActive(3);
+  stepActive(4);
   const list = state.fish.methods;
   $view.innerHTML = `<div class="section">
-    <h2>${state.spot.name} › ${state.fish.name} <span class="chip">釣り方を選ぶ</span></h2>
-    <div class="grid" style="margin-top:10px;">
-      ${list.map(m=>`<a class="clean" href="javascript:void(0)" onclick="pickMethod('${m.id}')">
-        <div class="card"><h3>${m.name}</h3><p>${m.plan.title}</p></div></a>`).join('')}
+    <h2>${state.place.name} › ${state.type.name} › ${state.fish.name} <span class="tag">釣り方</span></h2>
+    <div class="grid">
+      ${list.map(m=>`<div class="card">
+        <h3>${m.name}</h3><p>${m.plan.title}</p>
+        <div style="margin-top:8px"><button class="btn" onclick="pickMethod('${m.id}')">詳細を見る</button></div>
+      </div>`).join("")}
     </div>
   </div>`;
 }
-window.pickMethod = (mid)=>{ setState('method', state.fish.methods.find(m=>m.id===mid)); };
 
 function viewPlan(){
-  const {spot, fish, method} = state; const p = method.plan;
+  const {place,type,fish,method} = state; const p = method.plan;
   $view.innerHTML = `
     <div class="section">
-      <div class="small">ルート: <span class="mono">#${spot.id}/${fish.id}/${method.id}</span></div>
-      <h2 style="margin-top:6px">${spot.name} › ${fish.name} › <span class="chip">${method.name}</span></h2>
+      <div class="small">ルート: ${place.name} › ${type.name} › ${fish.name} › ${method.name}</div>
+      <h2 style="margin-top:6px">${p.title}</h2>
       <img class="hero" src="${p.hero}" alt="">
       <div class="row">
         <div class="item"><b>狙うポイント</b><br>${p.point}</div>
@@ -234,64 +408,70 @@ function viewPlan(){
         <div class="item"><b>ライン</b><br>${p.gear.line}</div>
         <div class="item"><b>オプション</b><br>${p.gear.option||'-'}</div>
       </div>
-      <h3 style="margin:14px 0 8px">おすすめ部材</h3>
+      <h3 style="margin:14px 0 8px">おすすめ部材（Amazon）</h3>
       <div class="grid">
         ${p.parts.map(it=>`<div class="card">
           <h3>${it.label}</h3><p class="small">Amazonで詳細を確認</p>
           <button class="btn" onclick="ext('${it.url}')">Amazonで見る</button>
         </div>`).join('')}
       </div>
-      <div style="display:flex; gap:8px; margin-top:14px">
-        <button class="btn secondary" onclick="historyBack()">戻る</button>
+      <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap">
+        <button class="btn secondary" onclick="backStep()">戻る</button>
         <button class="btn" onclick="sharePlan()">友だちに共有</button>
+        <button class="btn secondary" onclick="openMap('${place.id}')">地図を開く</button>
       </div>
     </div>`;
 }
-window.ext = (url)=> liff.openWindow({ url, external:true });
-window.historyBack = ()=>{ if(state.method){ setState('method',null); } else if(state.fish){ setState('fish',null);} else { setState('spot',null);} };
+
+/* ========== アクション ========== */
+window.pickPlace = id => setState("place", DB.find(p=>p.id===id));
+window.pickType  = id => setState("type",  state.place.types.find(t=>t.id===id));
+window.pickFish  = id => setState("fish",  state.type.fishes.find(f=>f.id===id));
+window.pickMethod= id => setState("method",state.fish.methods.find(m=>m.id===id));
+
+window.backStep = ()=>{
+  if(state.method){ setState("method",null); return; }
+  if(state.fish){   setState("fish",null);   return; }
+  if(state.type){   setState("type",null);   return; }
+  setState("place",null);
+};
+
+window.openMap = (pid)=>{
+  const url = DB.find(p=>p.id===pid).map;
+  liff.openWindow({ url, external:true });
+};
+
+window.ext = url => liff.openWindow({ url, external:true });
 
 function sharePlan(){
-  const {spot, fish, method} = state; const p = method.plan;
+  const {place,type,fish,method} = state; const p = method.plan;
   if(!liff.isApiAvailable('shareTargetPicker')){ alert('共有はLINEアプリから'); return; }
-  const btns = [
-    {type:"button", style:"primary", action:{type:"uri", label:"Amazonで見る", uri:p.parts[0]?.url || LIFF_URL}},
-    {type:"button", style:"secondary", action:{type:"uri", label:"RigNaviで開く", uri:`${LIFF_URL}#${spot.id}/${fish.id}/${method.id}`}}
-  ];
-  if(p.parts[1]) btns.unshift({type:"button", style:"primary", action:{type:"uri", label:"もう1件", uri:p.parts[1].url}});
   const flex = {
     type:"bubble",
-    hero:{type:"image",url:p.hero,size:"full",aspectMode:"cover",aspectRatio:"16:9"},
+    hero:{type:"image",url:p.hero, size:"full",aspectMode:"cover",aspectRatio:"16:9"},
     body:{type:"box",layout:"vertical",contents:[
       {type:"text",text:p.title,weight:"bold",wrap:true},
-      {type:"text",text:`場所:${spot.name} / 魚:${fish.name} / 釣法:${method.name}`,size:"sm",color:"#666666",wrap:true,margin:"sm"},
-      {type:"text",text:`ポイント:${p.point}`,wrap:true,size:"sm",margin:"md"},
-      {type:"text",text:`棚:${p.depth}`,wrap:true,size:"sm"},
+      {type:"text",text:`場所:${place.name} / ポイント:${type.name} / 魚:${fish.name} / 釣法:${method.name}`,size:"sm",color:"#666666",wrap:true,margin:"sm"},
+      {type:"text",text:`ポイント:${p.point}`,wrap:true,size:"sm"},
+      {type:"text",text:`棚:${p.depth}`,wrap:true,size:"sm"}
     ]},
-    footer:{type:"box",layout:"vertical",spacing:"md",contents:btns}
+    footer:{type:"box",layout:"vertical",spacing:"md",contents:[
+      {type:"button",style:"primary",action:{type:"uri",label:"Amazonを見る",uri:p.parts[0]?.url || LIFF_URL}},
+      {type:"button",style:"secondary",action:{type:"uri",label:"RigNaviで開く",uri:`${LIFF_URL}#${place.id}/${type.id}/${fish.id}/${method.id}`}}
+    ]}
   };
   liff.shareTargetPicker([{type:"flex",altText:p.title,contents:flex}]);
 }
 
-// ====== 画面切替 ======
+/* ========== レンダリング制御 ========== */
 function render(){
-  const s = state;
-  document.getElementById('s1').classList.toggle('active',!s.spot);
-  document.getElementById('s2').classList.toggle('active',s.spot && !s.fish);
-  document.getElementById('s3').classList.toggle('active',s.fish && !s.method);
-  if(!s.spot) return viewSpots();
-  if(!s.fish) return viewFish();
-  if(!s.method) return viewMethods();
-  return viewPlan();
-}
+  const s=state;
+  document.getElementById('st1').classList.toggle('active',!s.place);
+  document.getElementById('st2').classList.toggle('active',s.place && !s.type);
+  document.getElementById('st3').classList.toggle('active',s.type && !s.fish);
+  document.getElementById('st4').classList.toggle('active',s.fish && !s.method);
 
-// ====== 起動 ======
-(async()=>{
-  await liff.init({ liffId: LIFF_ID });
-  if(!liff.isLoggedIn()){ liff.login({prompt:'consent'}); return; }
-  try{ const p=await liff.getProfile(); document.getElementById('hello').textContent=`ようこそ ${p.displayName} さん`; }
-  catch{ document.getElementById('hello').textContent='ようこそ！'; }
-  initFromHash(); render();
-})();
-window.addEventListener('hashchange',()=>{ initFromHash(); render();});
-</script>
-</body></html>
+  if(!s.place)  return viewPlaces();
+  if(!s.type)   return viewTypes();
+  if(!s.fish)   return viewFish();
+  if(!s.method) return viewMeth
