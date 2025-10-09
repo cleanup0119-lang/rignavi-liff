@@ -1,0 +1,22 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RigNavi MVP</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>body{font-family:sans-serif;padding:20px}button{font-size:16px;padding:10px 14px}</style>
+</head><body>
+<h2 id="title">起動中...</h2>
+<button id="share" style="display:none">友だちに動作テストを送る</button>
+<script>
+(async () => {
+  await liff.init({ liffId: "2008257307-RwPLYWG1" });  // ←ここを差し替え
+  if (!liff.isLoggedIn()) { liff.login(); return; }
+  const p = await liff.getProfile();
+  document.getElementById('title').textContent = `ようこそ ${p.displayName} さん`;
+  const btn = document.getElementById('share');
+  btn.style.display = 'inline-block';
+  btn.onclick = async () => {
+    await liff.shareTargetPicker([{ type:'text', text:'RigNavi 起動テスト：動いてます！' }]);
+  };
+})();
+</script>
+</body></html>
