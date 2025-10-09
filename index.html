@@ -474,4 +474,23 @@ function render(){
   if(!s.place)  return viewPlaces();
   if(!s.type)   return viewTypes();
   if(!s.fish)   return viewFish();
-  if(!s.method) return viewMeth
+  if(!s.method) return viewMethods();
+  return viewPlan();
+}
+
+/* ========== 起動 ========== */
+(async()=>{
+  await liff.init({ liffId: LIFF_ID });
+  if(!liff.isLoggedIn()){ liff.login({prompt:"consent"}); return; }
+  try{
+    const p=await liff.getProfile();
+    document.getElementById('hello').textContent=`ようこそ ${p.displayName} さん`;
+  }catch{
+    document.getElementById('hello').textContent='ようこそ！';
+  }
+  initFromHash(); render();
+})();
+window.addEventListener('hashchange',()=>{ initFromHash(); render();});
+</script>
+</body></html>
+
