@@ -2,21 +2,134 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RigNavi MVP</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<style>body{font-family:sans-serif;padding:20px}button{font-size:16px;padding:10px 14px}</style>
+<style>
+  body{font-family:sans-serif;margin:0;padding:16px}
+  h2{margin:6px 0 14px}
+  .nav{display:flex;gap:8px;margin-bottom:12px}
+  .nav button{flex:1;padding:12px;font-size:16px;border-radius:8px}
+  .card{border:1px solid #ddd;border-radius:12px;padding:14px}
+  .ttl{font-weight:bold;font-size:18px;margin:0 0 6px}
+  .meta{color:#555;margin:4px 0}
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .actions a, .actions button{flex:1;padding:10px;font-size:15px;text-align:center;border-radius:8px}
+</style>
 </head><body>
-<h2 id="title">起動中...</h2>
-<button id="share" style="display:none">友だちに動作テストを送る</button>
+<h2 id="hello">起動中...</h2>
+
+<div class="nav">
+  <button id="btn-reco">おすすめ仕掛け</button>
+  <button id="btn-spot">場所から</button>
+  <button id="btn-depth">今日の棚</button>
+</div>
+
+<div id="content"></div>
+
 <script>
-(async () => {
-  await liff.init({ liffId: "2008257307-RwPLYWG1" });  // ←ここを差し替え
-  if (!liff.isLoggedIn()) { liff.login(); return; }
-  const p = await liff.getProfile();
-  document.getElementById('title').textContent = `ようこそ ${p.displayName} さん`;
-  const btn = document.getElementById('share');
-  btn.style.display = 'inline-block';
-  btn.onclick = async () => {
-    await liff.shareTargetPicker([{ type:'text', text:'RigNavi 起動テスト：動いてます！' }]);
+const LIFF_ID  = "2008257307-RwPLYWG1";
+const LIFF_URL = "https://liff.line.me/2008257307-RwPLYWG1";
+
+// まずは仮データ（後で画像URLとアフィリンクを差し替え）
+const RIGS = [
+  {
+    key:"reco",
+    name:"電気ウキ仕掛け",
+    target:"アジ・サバ（堤防夜釣り）",
+    depth:"表層〜中層",
+    desc:"夜の足元回遊を狙う定番。風に強い棒ウキを推奨。",
+    img:"https://via.placeholder.com/800x420?text=%E9%9B%BB%E6%B0%97%E3%82%A6%E3%82%AD",
+    shop:"https://www.amazon.co.jp/s?k=%E9%9B%BB%E6%B0%97%E3%82%A6%E3%82%AD+%E4%BB%95%E6%8E%9B%E3%81%91"
+  },
+  {
+    key:"spot",
+    name:"エレベーター仕掛け",
+    target:"青物（回遊次第）",
+    depth:"表層〜中層（誘い）",
+    desc:"オモリ落下→浮上でアピール。潮通しの良い堤防向け。",
+    img:"https://via.placeholder.com/800x420?text=%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC",
+    shop:"https://www.amazon.co.jp/s?k=%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC+%E4%BB%95%E6%8E%9B%E3%81%91"
+  },
+  {
+    key:"depth",
+    name:"名古屋天秤（胴突き）",
+    target:"カサゴ・メバル",
+    depth:"底（根回り）",
+    desc:"根掛かり回避しやすい。夜の常夜灯周りで実績◎",
+    img:"https://via.placeholder.com/800x420?text=%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%A4%A9%E7%A7%A4",
+    shop:"https://www.amazon.co.jp/s?k=%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%A4%A9%E7%A7%A4"
+  }
+];
+
+function renderRig(rig){
+  const el = document.getElementById('content');
+  el.innerHTML = `
+    <div class="card">
+      <p class="ttl">${rig.name}</p>
+      <img src="${rig.img}" alt="" style="width:100%;border-radius:8px;margin:6px 0;">
+      <p class="meta">対象：${rig.target}</p>
+      <p class="meta">棚：${rig.depth}</p>
+      <p>${rig.desc}</p>
+      <div class="actions">
+        <a id="link-shop" href="${rig.shop}" target="_blank" rel="noopener">Amazonで見る</a>
+        <button id="btn-share">友だちに共有</button>
+      </div>
+    </div>
+  `;
+  // Amazonは外部ブラウザで開く
+  document.getElementById('link-shop').onclick = (e) => {
+    e.preventDefault();
+    liff.openWindow({ url: rig.shop, external: true });
   };
+  document.getElementById('btn-share').onclick = () => shareRig(rig);
+}
+
+function shareRig(rig){
+  if (!liff.isApiAvailable('shareTargetPicker')) {
+    alert('共有はLINEアプリからご利用ください'); return;
+  }
+  const msg = {
+    type: "flex",
+    altText: `RigNavi: ${rig.name}`,
+    contents: {
+      type:"bubble",
+      hero:{type:"image", url:rig.img, size:"full", aspectMode:"cover", aspectRatio:"16:9"},
+      body:{type:"box", layout:"vertical", contents:[
+        {type:"text", text:rig.name, weight:"bold", size:"md"},
+        {type:"text", text:`対象：${rig.target}`, size:"sm", color:"#666", margin:"sm"},
+        {type:"text", text:`棚：${rig.depth}`, size:"sm", color:"#666"},
+        {type:"text", text:rig.desc, wrap:true, size:"sm", margin:"md"}
+      ]},
+      footer:{type:"box", layout:"vertical", spacing:"md", contents:[
+        {type:"button", style:"primary", action:{type:"uri", label:"Amazonで見る", uri:rig.shop}},
+        {type:"button", style:"secondary", action:{type:"uri", label:"RigNaviで開く", uri:`${LIFF_URL}#${rig.key}`}}
+      ]}
+    }
+  };
+  liff.shareTargetPicker([msg]);
+}
+
+function showByKey(key){
+  const rig = RIGS.find(r => r.key === key) || RIGS[0];
+  renderRig(rig);
+}
+
+(async () => {
+  await liff.init({ liffId: LIFF_ID });
+  if (!liff.isLoggedIn()) { liff.login({ prompt:'consent' }); return; }
+
+  // 挨拶
+  try {
+    const p = await liff.getProfile();
+    document.getElementById('hello').textContent = `ようこそ ${p.displayName} さん`;
+  } catch { document.getElementById('hello').textContent = 'ようこそ！'; }
+
+  // 初期タブ（ハッシュから）
+  const key = (location.hash || '#reco').replace('#','');
+  showByKey(key);
+
+  // ナビ
+  document.getElementById('btn-reco').onclick  = () => { location.hash='reco';  showByKey('reco'); };
+  document.getElementById('btn-spot').onclick  = () => { location.hash='spot';  showByKey('spot'); };
+  document.getElementById('btn-depth').onclick = () => { location.hash='depth'; showByKey('depth'); };
 })();
 </script>
 </body></html>
