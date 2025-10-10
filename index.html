@@ -12,7 +12,6 @@
     --glass:#ffffffc9; --line:#d8e9f3;
     --card:#ffffff; --chip:#f4faff;
     --accent:#12b6ff; --accent-ink:#013449;
-    --ok:#10b981;
   }
   *{box-sizing:border-box} html,body{height:100%}
   body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg1),var(--bg2))}
@@ -74,7 +73,7 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "11";
+const VERSION = "13";
 
 /* ===== ユーティリティ ===== */
 function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\wぁ-んァ-ン一-龯ー]+/g,'-'); }
@@ -135,533 +134,174 @@ function rigImg(fish,method){
   };
 }
 
-/* ===== 魚種データ（前回のまま＋多数） ===== */
-// 魚種データベース
+/* ===== 魚種データ（完全版） ===== */
 const FISH_BOOK = {
   /* 小型回遊魚・ベイト系 */
-  "豆アジ": {
-    season:"初夏〜秋（6–11月）",
-    time:"朝夕マズメ／夜の常夜灯",
-    shelf:"表層〜中層（常夜灯直下は浅め）",
-    methods:["サビキ","ウキ","ロケットサビキ","ちょい投げ"],
-    bait:["アミエビ"],
-    lures:["マイクロジグ","0.5–1g ジグヘッド＋極小ワーム"],
-    food:"南蛮漬け／唐揚げ",
-    gear:["極小サビキ 0.5–1号","ウキサビキ"]
-  },
-  "アジ": {
-    season:"初夏〜秋（越冬群れも）",
-    time:"朝夕／夜常夜灯",
-    shelf:"中層〜底寄り（船道・潮目・明暗）",
+  "豆アジ": { season:"初夏〜秋（6–11月）", time:"朝夕マズメ／夜の常夜灯", shelf:"表層〜中層（常夜灯直下は浅め）",
+    methods:["サビキ","ウキ","ロケットサビキ","ちょい投げ"], bait:["アミエビ"],
+    lures:["マイクロジグ","0.5–1g ジグヘッド＋極小ワーム"], food:"南蛮漬け／唐揚げ",
+    gear:["極小サビキ 0.5–1号","ウキサビキ"] },
+  "アジ": { season:"初夏〜秋（越冬群れも）", time:"朝夕／夜常夜灯", shelf:"中層〜底寄り（船道・潮目・明暗）",
     methods:["サビキ","ロケットサビキ","ウキ","ちょい投げ","遠投カゴ","ルアー(軽量)"],
-    bait:["アミエビ","オキアミ","青イソメ"],
-    lures:["1–2g ジグヘッド＋ワーム","7–20g メタル","フロート/キャロ"],
-    food:"刺身／なめろう／フライ／南蛮漬け"
-  },
-  "イワシ": {
-    season:"春〜秋",
-    time:"朝夕中心（群れ次第）",
-    shelf:"表層〜中層（潮目・明暗）",
-    methods:["サビキ","ウキ"],
-    bait:["アミエビ"],
-    lures:["マイクロジグ","小スプーン"],
-    food:"刺身／天ぷら／梅煮／酢漬け"
-  },
-  "サッパ": {
-    season:"夏〜秋",
-    time:"日中〜夜（常夜灯）",
-    shelf:"表層〜中層",
-    methods:["サビキ","ウキ"],
-    bait:["アミエビ"],
-    lures:["小型ジグ","ミノー"],
-    food:"南蛮漬け／酢締め"
-  },
-  "コハダ": {
-    season:"初夏〜秋",
-    time:"朝夕〜夜",
-    shelf:"表層〜中層（群れ打ち）",
-    methods:["サビキ","ウキ","カゴ"],
-    bait:["アミエビ"],
-    lures:["小型メタル","ミノー"],
-    food:"酢締め（寿司だね）"
-  },
-  "コノシロ": {
-    season:"初夏〜晩秋",
-    time:"朝夕〜夜",
-    shelf:"表層〜中層",
-    methods:["サビキ","ウキ","カゴ"],
-    bait:["アミエビ"],
-    lures:["小型メタル","ミノー"],
-    food:"南蛮漬け／酢締め"
-  },
-  "サバ": {
-    season:"夏〜秋",
-    time:"朝夕",
-    shelf:"中層（潮目直撃）",
-    methods:["遠投カゴ","サビキ","ジギング"],
-    bait:["オキアミ","アミエビ"],
-    lures:["20–40g メタル","ミノー","バイブ"],
-    food:"塩焼き／味噌煮／しめ鯖（冷凍等の寄生虫対策必須）"
-  },
-  "サヨリ": {
-    season:"秋〜冬",
-    time:"日中〜夕（凪◎）",
-    shelf:"表層",
-    methods:["ウキ","遠投カゴ"],
-    bait:["ササミ赤染め","アミ","オキアミ"],
-    lures:["フロート＋極小ジグヘッド"],
-    food:"刺身・昆布締め／天ぷら"
-  },
-  "カマス": {
-    season:"秋〜初冬",
-    time:"朝夕／夜（常夜灯）",
-    shelf:"中層〜表層",
-    methods:["ウキ","ルアー"],
-    bait:["キビナゴ","ササミ"],
-    lures:["小型ミノー","メタル","ジグサビキ"],
-    food:"塩焼き／一夜干し／フライ"
-  },
+    bait:["アミエビ","オキアミ","青イソメ"], lures:["1–2g ジグヘッド＋ワーム","7–20g メタル","フロート/キャロ"],
+    food:"刺身／なめろう／フライ／南蛮漬け" },
+  "イワシ": { season:"春〜秋", time:"朝夕中心（群れ次第）", shelf:"表層〜中層（潮目・明暗）",
+    methods:["サビキ","ウキ"], bait:["アミエビ"], lures:["マイクロジグ","小スプーン"], food:"刺身／天ぷら／梅煮／酢漬け" },
+  "サッパ": { season:"夏〜秋", time:"日中〜夜（常夜灯）", shelf:"表層〜中層",
+    methods:["サビキ","ウキ"], bait:["アミエビ"], lures:["小型ジグ","ミノー"], food:"南蛮漬け／酢締め" },
+  "コハダ": { season:"初夏〜秋", time:"朝夕〜夜", shelf:"表層〜中層（群れ打ち）",
+    methods:["サビキ","ウキ","カゴ"], bait:["アミエビ"], lures:["小型メタル","ミノー"], food:"酢締め（寿司だね）" },
+  "コノシロ": { season:"初夏〜晩秋", time:"朝夕〜夜", shelf:"表層〜中層",
+    methods:["サビキ","ウキ","カゴ"], bait:["アミエビ"], lures:["小型メタル","ミノー"], food:"南蛮漬け／酢締め" },
+  "サバ": { season:"夏〜秋", time:"朝夕", shelf:"中層（潮目直撃）",
+    methods:["遠投カゴ","サビキ","ジギング"], bait:["オキアミ","アミエビ"],
+    lures:["20–40g メタル","ミノー","バイブ"], food:"塩焼き／味噌煮／しめ鯖（冷凍対策必須）" },
+  "サヨリ": { season:"秋〜冬", time:"日中〜夕（凪◎）", shelf:"表層",
+    methods:["ウキ","遠投カゴ"], bait:["ササミ赤染め","アミ","オキアミ"], lures:["フロート＋極小ジグヘッド"], food:"刺身・昆布締め／天ぷら" },
+  "カマス": { season:"秋〜初冬", time:"朝夕／夜（常夜灯）", shelf:"中層〜表層",
+    methods:["ウキ","ルアー"], bait:["キビナゴ","ササミ"], lures:["小型ミノー","メタル","ジグサビキ"], food:"塩焼き／一夜干し／フライ" },
 
   /* 根魚・沿岸・底物 */
-  "メバル": {
-    season:"冬〜春",
-    time:"夜（常夜灯）",
-    shelf:"表層〜中層（明暗・角・係留船）",
-    methods:["ウキ","胴突き","ルアー(軽量)"],
-    bait:["青イソメ","オキアミ"],
-    lures:["0.5–2g ジグヘッド＋ワーム","フロート"],
-    food:"煮付け／塩焼き"
-  },
-  "カサゴ": {
-    season:"通年（冬〜春◎）",
-    time:"夜有利（昼は穴撃ち）",
-    shelf:"底（テトラ・根・壁際）",
-    methods:["ちょい投げ","胴突き","ブラクリ","穴釣り","テキサス"],
-    bait:["青イソメ","サバ切り身","オキアミ"],
-    lures:["テキサス＋クロー/ホッグ","ジグヘッド"],
-    food:"唐揚げ／味噌汁／煮付け"
-  },
-  "アイナメ": {
-    season:"晩秋〜春",
-    time:"日中〜夕",
-    shelf:"底（岩礁・藻場・テトラ穴）",
-    methods:["ちょい投げ","ブラクリ","胴突き","前打ち"],
-    bait:["青イソメ","エビ類","イカ短"],
-    lures:["テキサス","ジグヘッド"],
-    food:"昆布締め／天ぷら／煮付け"
-  },
-  "シロギス": {
-    season:"初夏〜秋",
-    time:"日中",
-    shelf:"底（駆け上がり・離岸流脇）",
-    methods:["ちょい投げ","投げ"],
-    bait:["ジャリメ/イソメ","本虫"],
-    lures:["軽量メタル","専用ワーム"],
-    food:"天ぷら／フライ"
-  },
-  "イシモチ": {
-    season:"陸っぱり5–11月（船は冬も）",
-    time:"夜と朝マズメ（濁り◎）",
-    shelf:"底",
-    methods:["ちょい投げ","胴突き"],
-    bait:["アオイソメ","イカ短"],
-    lures:[],
-    food:"唐揚げ／塩焼き／煮付け"
-  },
-  "カレイ": {
-    season:"冬〜春",
-    time:"朝夕（置き竿可）",
-    shelf:"底ベッタリ（船道のかけ上がり）",
-    methods:["投げ"],
-    bait:["本虫","青イソメ","アオヤギ（地域差）"],
-    lures:["ビーズ/夜光玉（装飾）"],
-    food:"煮付け／唐揚げ"
-  },
-  "メゴチ": {
-    season:"初夏〜秋",
-    time:"日中",
-    shelf:"底（駆け上がり）",
-    methods:["ちょい投げ","投げ"],
-    bait:["イソメ類"],
-    lures:[],
-    food:"天ぷら（骨せんべい◎）"
-  },
-  "カワハギ": {
-    season:"秋〜冬（肝パン）",
-    time:"日中",
-    shelf:"底〜中層（宙釣りも）",
-    methods:["胴突き","宙釣り"],
-    bait:["アサリむき身（塩締め）"],
-    lures:["小型ワーム（なんちゃって可）"],
-    food:"肝醤油刺し／唐揚げ／煮付け"
-  },
-  "ギマ": {
-    season:"梅雨〜夏",
-    time:"日中",
-    shelf:"底（砂地）",
-    methods:["ちょい投げ"],
-    bait:["イソメ類"],
-    lures:[],
-    food:"唐揚げ／味噌汁／肝和え"
-  },
+  "メバル": { season:"冬〜春", time:"夜（常夜灯）", shelf:"表層〜中層（明暗・角・係留船）",
+    methods:["ウキ","胴突き","ルアー(軽量)"], bait:["青イソメ","オキアミ"], lures:["0.5–2g ジグヘッド＋ワーム","フロート"], food:"煮付け／塩焼き" },
+  "カサゴ": { season:"通年（冬〜春◎）", time:"夜有利（昼は穴撃ち）", shelf:"底（テトラ・根・壁際）",
+    methods:["ちょい投げ","胴突き","ブラクリ","穴釣り","テキサス"], bait:["青イソメ","サバ切り身","オキアミ"],
+    lures:["テキサス＋クロー/ホッグ","ジグヘッド"], food:"唐揚げ／味噌汁／煮付け" },
+  "アイナメ": { season:"晩秋〜春", time:"日中〜夕", shelf:"底（岩礁・藻場・テトラ穴）",
+    methods:["ちょい投げ","ブラクリ","胴突き","前打ち"], bait:["青イソメ","エビ類","イカ短"], lures:["テキサス","ジグヘッド"], food:"昆布締め／天ぷら／煮付け" },
+  "シロギス": { season:"初夏〜秋", time:"日中", shelf:"底（駆け上がり・離岸流脇）",
+    methods:["ちょい投げ","投げ"], bait:["ジャリメ/イソメ","本虫"], lures:["軽量メタル","専用ワーム"], food:"天ぷら／フライ" },
+  "イシモチ": { season:"陸っぱり5–11月（船は冬も）", time:"夜と朝マズメ（濁り◎）", shelf:"底",
+    methods:["ちょい投げ","胴突き"], bait:["アオイソメ","イカ短"], lures:[], food:"唐揚げ／塩焼き／煮付け" },
+  "カレイ": { season:"冬〜春", time:"朝夕（置き竿可）", shelf:"底ベッタリ（船道のかけ上がり）",
+    methods:["投げ"], bait:["本虫","青イソメ","アオヤギ（地域差）"], lures:["ビーズ/夜光玉（装飾）"], food:"煮付け／唐揚げ" },
+  "メゴチ": { season:"初夏〜秋", time:"日中", shelf:"底（駆け上がり）",
+    methods:["ちょい投げ","投げ"], bait:["イソメ類"], lures:[], food:"天ぷら（骨せんべい◎）" },
+  "カワハギ": { season:"秋〜冬（肝パン）", time:"日中", shelf:"底〜中層（宙釣りも）",
+    methods:["胴突き","宙釣り"], bait:["アサリむき身（塩締め）"], lures:["小型ワーム（なんちゃって可）"], food:"肝醤油刺し／唐揚げ／煮付け" },
+  "ギマ": { season:"梅雨〜夏", time:"日中", shelf:"底（砂地）",
+    methods:["ちょい投げ"], bait:["イソメ類"], lures:[], food:"唐揚げ／味噌汁／肝和え" },
 
   /* ハゼ */
-  "マハゼ": {
-    season:"夏〜晩秋",
-    time:"日中〜夕（満ち引き前後）",
-    shelf:"底（ミオ筋・障害物際）",
-    methods:["ミャク釣り","ウキ","ちょい投げ","ハゼクラ"],
-    bait:["アオイソメ","エビ身","ホタテ","イカ短"],
-    lures:["小型クランク","1g前後ジグヘッド"],
-    food:"天ぷら／唐揚げ／甘露煮"
-  },
-  "ウロハゼ": {
-    season:"夏〜秋",
-    time:"日中（潮位変化を意識）",
-    shelf:"底（護岸キワ、捨石周り）",
-    methods:["ミャク釣り"],
-    bait:["アオイソメ","エビ身"],
-    lures:[],
-    food:"唐揚げ／天ぷら"
-  },
+  "マハゼ": { season:"夏〜晩秋", time:"日中〜夕（満ち引き前後）", shelf:"底（ミオ筋・障害物際）",
+    methods:["ミャク釣り","ウキ","ちょい投げ","ハゼクラ"], bait:["アオイソメ","エビ身","ホタテ","イカ短"],
+    lures:["小型クランク","1g前後ジグヘッド"], food:"天ぷら／唐揚げ／甘露煮" },
+  "ウロハゼ": { season:"夏〜秋", time:"日中（潮位変化を意識）", shelf:"底（護岸キワ、捨石周り）",
+    methods:["ミャク釣り"], bait:["アオイソメ","エビ身"], lures:[], food:"唐揚げ／天ぷら" },
 
   /* フラットフィッシュ */
-  "ソゲ": {
-    season:"初夏〜秋",
-    time:"朝夕・濁り後",
-    shelf:"底上〜1m（駆け上がり・払い出し）",
-    methods:["ルアー","泳がせ"],
-    bait:["活ハゼ","小アジ"],
-    lures:["ミノー","シンペン","ジグヘッド＋シャッド"],
-    food:"唐揚げ／ムニエル"
-  },
-  "ヒラメ": {
-    season:"晩秋〜冬＋春",
-    time:"朝夕・荒れ後の回復時",
-    shelf:"底上1m以内（離岸流・地形変化・堤防際のヨレ）",
-    methods:["泳がせ","ぶっこみ","ルアー"],
-    bait:["活アジ/コノシロ/ハゼ","サバ切り身"],
-    lures:["シンキングミノー","シンペン","ジグヘッド＋ワーム","メタル"],
-    food:"刺身・昆布締め／ムニエル"
-  },
-  "マゴチ": {
-    season:"初夏〜秋",
-    time:"朝夕〜日中（干満前後）",
-    shelf:"底（駆け上がり・河口のヨレ）",
-    methods:["泳がせ","ぶっこみ","ルアー","エレベーター"],
-    bait:["活ハゼ","小アジ","サバ切り身"],
-    lures:["ジグヘッド＋ワーム","バイブ","メタル","テキサス"],
-    food:"薄造り／天ぷら／ムニエル"
-  },
+  "ソゲ": { season:"初夏〜秋", time:"朝夕・濁り後", shelf:"底上〜1m（駆け上がり・払い出し）",
+    methods:["ルアー","泳がせ"], bait:["活ハゼ","小アジ"], lures:["ミノー","シンペン","ジグヘッド＋シャッド"], food:"唐揚げ／ムニエル" },
+  "ヒラメ": { season:"晩秋〜冬＋春", time:"朝夕・荒れ後の回復時", shelf:"底上1m以内（離岸流・地形変化・堤防際のヨレ）",
+    methods:["泳がせ","ぶっこみ","ルアー"], bait:["活アジ/コノシロ/ハゼ","サバ切り身"],
+    lures:["シンキングミノー","シンペン","ジグヘッド＋ワーム","メタル"], food:"刺身・昆布締め／ムニエル" },
+  "マゴチ": { season:"初夏〜秋", time:"朝夕〜日中（干満前後）", shelf:"底（駆け上がり・河口のヨレ）",
+    methods:["泳がせ","ぶっこみ","ルアー","エレベーター"], bait:["活ハゼ","小アジ","サバ切り身"],
+    lures:["ジグヘッド＋ワーム","バイブ","メタル","テキサス"], food:"薄造り／天ぷら／ムニエル" },
 
-  /* スズキ（成長名） */
-  "セイゴ": {
-    season:"通年（春バチ/夏秋小ベイト）",
-    time:"夕・夜・朝マズメ",
-    shelf:"表層〜中層（明暗・壁際・角）",
-    methods:["ルアー","ウキ","ミャク釣り"],
-    bait:["青イソメ","小魚"],
-    lures:["50–80mmミノー","3–10gジグ","フロート"],
-    food:"唐揚げ／塩焼き"
-  },
-  "フッコ": {
-    season:"通年（秋最盛）",
-    time:"夕・夜・朝マズメ",
-    shelf:"表層〜中層（潮替わり・反転流）",
-    methods:["ルアー","泳がせ","ぶっこみ"],
-    bait:["活アジ/イワシ/コノシロ","青イソメ"],
-    lures:["90–120mmミノー","シンペン","バイブ","30–40gジグ"],
-    food:"ムニエル／ポワレ／塩焼き"
-  },
-  "スズキ": {
-    season:"通年（秋ベイト・冬越冬）",
-    time:"夕・夜・朝マズメ",
-    shelf:"表層〜中層（払い出し・ヨレ・ブレイク）",
-    methods:["ルアー","泳がせ"],
-    bait:["活小魚（コノシロ等）"],
-    lures:["120–140mmミノー","重めシンペン/バイブ","40gジグ","ビッグベイト"],
-    food:"洗い／活〆刺身／ムニエル"
-  },
+  /* スズキ（成長名別：別ページで出します） */
+  "セイゴ": { season:"通年（春バチ/夏秋小ベイト）", time:"夕・夜・朝マズメ",
+    shelf:"表層〜中層（明暗・壁際・角）", methods:["ルアー","ウキ","ミャク釣り"],
+    bait:["青イソメ","小魚"], lures:["50–80mmミノー","3–10gジグ","フロート"], food:"唐揚げ／塩焼き" },
+  "フッコ": { season:"通年（秋最盛）", time:"夕・夜・朝マズメ",
+    shelf:"表層〜中層（潮替わり・反転流）", methods:["ルアー","泳がせ","ぶっこみ"],
+    bait:["活アジ/イワシ/コノシロ","青イソメ"], lures:["90–120mmミノー","シンペン","バイブ","30–40gジグ"], food:"ムニエル／ポワレ／塩焼き" },
+  "スズキ": { season:"通年（秋ベイト・冬越冬）", time:"夕・夜・朝マズメ",
+    shelf:"表層〜中層（払い出し・ヨレ・ブレイク）", methods:["ルアー","泳がせ"],
+    bait:["活小魚（コノシロ等）"], lures:["120–140mmミノー","重めシンペン/バイブ","40gジグ","ビッグベイト"], food:"洗い／活〆刺身／ムニエル" },
 
   /* ブリ系 */
-  "ワカシ": {
-    season:"初夏〜秋",
-    time:"朝マズメ",
-    shelf:"表層〜中層（潮目・鳥山）",
-    methods:["ジギング","遠投カゴ"],
-    bait:["オキアミ（カゴ）"],
-    lures:["30–40gメタル","ヘビーシンペン"],
-    food:"刺身／漬け／フライ"
-  },
-  "イナダ": {
-    season:"秋中心",
-    time:"朝マズメ",
-    shelf:"表層〜中層",
-    methods:["ジギング","プラッギング","泳がせ"],
-    bait:["活小魚"],
-    lures:["40–60gメタル","ミノー"],
-    food:"刺身／照り焼き"
-  },
-  "ワラサ": {
-    season:"秋",
-    time:"朝マズメ",
-    shelf:"中層中心",
-    methods:["ジギング重め","泳がせ"],
-    bait:["活小魚"],
-    lures:["50–80gメタル","ヘビーシンペン"],
-    food:"刺身／照り焼き／カマ塩焼き"
-  },
-  "ブリ": {
-    season:"秋〜初冬",
-    time:"朝マズメ",
-    shelf:"中層（潮目直下）",
-    methods:["ジギング大型","泳がせ"],
-    bait:["活小魚"],
-    lures:["60–100gメタル","ビッグミノー"],
-    food:"ブリしゃぶ／刺身／照り焼き"
-  },
+  "ワカシ": { season:"初夏〜秋", time:"朝マズメ", shelf:"表層〜中層（潮目・鳥山）",
+    methods:["ジギング","遠投カゴ"], bait:["オキアミ（カゴ）"], lures:["30–40gメタル","ヘビーシンペン"], food:"刺身／漬け／フライ" },
+  "イナダ": { season:"秋中心", time:"朝マズメ", shelf:"表層〜中層",
+    methods:["ジギング","プラッギング","泳がせ"], bait:["活小魚"], lures:["40–60gメタル","ミノー"], food:"刺身／照り焼き" },
+  "ワラサ": { season:"秋", time:"朝マズメ", shelf:"中層中心",
+    methods:["ジギング重め","泳がせ"], bait:["活小魚"], lures:["50–80gメタル","ヘビーシンペン"], food:"刺身／照り焼き／カマ塩焼き" },
+  "ブリ": { season:"秋〜初冬", time:"朝マズメ", shelf:"中層（潮目直下）",
+    methods:["ジギング大型","泳がせ"], bait:["活小魚"], lures:["60–100gメタル","ビッグミノー"], food:"ブリしゃぶ／刺身／照り焼き" },
 
   /* サワラ系 */
-  "サゴシ": {
-    season:"秋（年により春）",
-    time:"朝マズメ",
-    shelf:"表層高速回遊",
-    methods:["ジギング","ルアー"],
-    bait:[],
-    lures:["40–60gメタル","シンペン/ミノー速巻き"],
-    food:"フライ／ムニエル"
-  },
-  "サワラ": {
-    season:"秋（年により春）",
-    time:"朝マズメ",
-    shelf:"表層",
-    methods:["プラッギング","ジギング"],
-    bait:[],
-    lures:["重めミノー/シンペン","メタル高速"],
-    food:"炙り刺し／西京焼き"
-  },
+  "サゴシ": { season:"秋（年により春）", time:"朝マズメ", shelf:"表層高速回遊",
+    methods:["ジギング","ルアー"], bait:[], lures:["40–60gメタル","シンペン/ミノー速巻き"], food:"フライ／ムニエル" },
+  "サワラ": { season:"秋（年により春）", time:"朝マズメ", shelf:"表層",
+    methods:["プラッギング","ジギング"], bait:[], lures:["重めミノー/シンペン","メタル高速"], food:"炙り刺し／西京焼き" },
 
   /* タチウオ */
-  "タチウオ": {
-    season:"夏後半〜晩秋",
-    time:"夕まずめ〜夜",
-    shelf:"中層〜上層（当たりレンジ固定）",
-    methods:["ウキ","テンヤ","ワインド","ジギング"],
-    bait:["キビナゴ","ドジョウ","サンマ切り身"],
-    lures:["30–60gメタル","ワインド","バイブ"],
-    food:"塩焼き／天ぷら／炙り刺し"
-  },
+  "タチウオ": { season:"夏後半〜晩秋", time:"夕まずめ〜夜", shelf:"中層〜上層（当たりレンジ固定）",
+    methods:["ウキ","テンヤ","ワインド","ジギング"], bait:["キビナゴ","ドジョウ","サンマ切り身"],
+    lures:["30–60gメタル","ワインド","バイブ"], food:"塩焼き／天ぷら／炙り刺し" },
 
   /* クロダイ・キビレ */
-  "クロダイ": {
-    season:"春ノッコミ＋夏秋",
-    time:"日中〜夕（濁り◎）",
-    shelf:"底〜中層（壁際30cm）",
-    methods:["落とし込み","前打ち","フカセ","ぶっこみ","ルアー"],
-    bait:["カニ","イガイ","オキアミ","コーン"],
-    lures:["テキサス/フリーリグ","バイブ"],
-    food:"刺身（活〆）／塩焼き／煮付け"
-  },
-  "キビレ": {
-    season:"初夏〜秋",
-    time:"夕〜夜（風波◎）",
-    shelf:"底（護岸キワ）",
-    methods:["落とし込み","チニング","ぶっこみ"],
-    bait:["カニ","青イソメ"],
-    lures:["テキサス/フリーリグ","シャッド/クロー"],
-    food:"カルパッチョ／塩焼き"
-  },
+  "クロダイ": { season:"春ノッコミ＋夏秋", time:"日中〜夕（濁り◎）", shelf:"底〜中層（壁際30cm）",
+    methods:["落とし込み","前打ち","フカセ","ぶっこみ","ルアー"], bait:["カニ","イガイ","オキアミ","コーン"],
+    lures:["テキサス/フリーリグ","バイブ"], food:"刺身（活〆）／塩焼き／煮付け" },
+  "キビレ": { season:"初夏〜秋", time:"夕〜夜（風波◎）", shelf:"底（護岸キワ）",
+    methods:["落とし込み","チニング","ぶっこみ"], bait:["カニ","青イソメ"], lures:["テキサス/フリーリグ","シャッド/クロー"], food:"カルパッチョ／塩焼き" },
 
   /* ボラ系 */
-  "オボコ/スバシリ": {
-    season:"春〜初夏",
-    time:"日中",
-    shelf:"表層",
-    methods:["ウキ","コマセ"],
-    bait:["パン","練り餌"],
-    lures:[],
-    food:"—（観察・リリース推奨）"
-  },
-  "イナ（ボラ若魚）": {
-    season:"夏〜秋",
-    time:"日中〜夕",
-    shelf:"表層〜中層",
-    methods:["フカセ","ウキ","ルアー外道"],
-    bait:["パン","練り餌","アミ"],
-    lures:["小型メタル","ミノー"],
-    food:"洗い／味噌汁"
-  },
-  "ボラ": {
-    season:"通年（寒ボラは冬が旨い）",
-    time:"日中〜夕",
-    shelf:"表層〜中層",
-    methods:["コマセ","ウキ","ルアー外道"],
-    bait:["パン","練り餌","アミ"],
-    lures:["小型メタル","ミノー"],
-    food:"洗い（氷水）／味噌汁／卵はカラスミ"
-  },
+  "オボコ/スバシリ": { season:"春〜初夏", time:"日中", shelf:"表層",
+    methods:["ウキ","コマセ"], bait:["パン","練り餌"], lures:[], food:"—（観察・リリース推奨）" },
+  "イナ（ボラ若魚）": { season:"夏〜秋", time:"日中〜夕", shelf:"表層〜中層",
+    methods:["フカセ","ウキ","ルアー外道"], bait:["パン","練り餌","アミ"], lures:["小型メタル","ミノー"], food:"洗い／味噌汁" },
+  "ボラ": { season:"通年（寒ボラは冬が旨い）", time:"日中〜夕", shelf:"表層〜中層",
+    methods:["コマセ","ウキ","ルアー外道"], bait:["パン","練り餌","アミ"], lures:["小型メタル","ミノー"], food:"洗い（氷水）／味噌汁／卵はカラスミ" },
 
   /* 河口・長物 */
-  "ウナギ": {
-    season:"初夏〜秋（※採捕規制・禁漁・サイズ規定の確認必須）",
-    time:"夜（雨後・濁り◎）",
-    shelf:"底（ヘチ・泥底）",
-    methods:["ぶっこみ"],
-    bait:["ミミズ/ドバ","ハゼ/サバ切り身"],
-    lures:[],
-    food:"白焼き／蒲焼（地域ルール厳守）"
-  },
-  "マアナゴ": {
-    season:"晩春〜夏（陸）／船は通年可",
-    time:"日没〜21時台",
-    shelf:"底（砂泥底・船道）",
-    methods:["ぶっこみ","胴突き"],
-    bait:["アオイソメ束","イカ短","青魚切り身"],
-    lures:[],
-    food:"天ぷら／煮アナゴ／白焼き"
-  },
-  "アカエイ": {
-    season:"夏中心（高水温期）",
-    time:"日中〜夜",
-    shelf:"底（砂泥底・河口）",
-    methods:["ぶっこみ"],
-    bait:["サバ/イカ切り身","貝類"],
-    lures:[],
-    food:"ヒレの煮凝り/唐揚げ（※毒棘厳重注意／無理は禁物）"
-  },
+  "ウナギ": { season:"初夏〜秋（※採捕規制の確認必須）", time:"夜（雨後・濁り◎）",
+    shelf:"底（ヘチ・泥底）", methods:["ぶっこみ"], bait:["ミミズ/ドバ","ハゼ/サバ切り身"], lures:[], food:"白焼き／蒲焼（地域ルール遵守）" },
+  "マアナゴ": { season:"晩春〜夏（陸）／船は通年", time:"日没〜21時台", shelf:"底（砂泥底・船道）",
+    methods:["ぶっこみ","胴突き"], bait:["アオイソメ束","イカ短","青魚切り身"], lures:[], food:"天ぷら／煮アナゴ／白焼き" },
+  "アカエイ": { season:"夏中心（高水温期）", time:"日中〜夜", shelf:"底（砂泥底・河口）",
+    methods:["ぶっこみ"], bait:["サバ/イカ切り身","貝類"], lures:[], food:"ヒレの煮凝り/唐揚げ（毒棘注意）" },
 
-  /* 頭足類 */
-  "アオリイカ（新子）": {
-    season:"秋（9–11月）",
-    time:"朝夕〜夜",
-    shelf:"表層〜中層（藻場・壁際）",
-    methods:["エギング"],
-    bait:[],
-    lures:["エギ 2.5–3号"],
-    food:"刺身／天ぷら"
-  },
-  "アオリイカ（親イカ）": {
-    season:"春（4–6月）",
-    time:"朝夕〜夜",
-    shelf:"中層（やや深め）",
-    methods:["エギング"],
-    bait:[],
-    lures:["エギ 3.0–3.5号＋シンカー"],
-    food:"刺身／塩焼き／バター焼き"
-  },
-  "モンゴウイカ": {
-    season:"秋〜春",
-    time:"日中中心",
-    shelf:"底上10–20cm（砂泥底）",
-    methods:["エギング","スッテ","（船）餌巻きテーラ"],
-    bait:[],
-    lures:["エギ3.0–3.5号","スッテ"],
-    food:"天ぷら／刺身／墨煮"
-  },
-  "マダコ": {
-    season:"初夏〜秋（6–8月中心）",
-    time:"日中",
-    shelf:"底（ストラクチャー直撃）",
-    methods:["タコエギ","テンヤ"],
-    bait:["カニ","サバ身（テンヤ）"],
-    lures:["タコエギ","スッテ"],
-    food:"茹で／唐揚げ／ガーリックバター"
-  },
-
-  /* 都市河川・池の追加生物（DBに登場するため補完） */
-  "テナガエビ": {
-    season:"初夏〜盛夏",
-    time:"日中〜夕（橋影・護岸の際）",
-    shelf:"超浅場（敷石・杭・沈み物の際）",
-    methods:["ミャク釣り","小ウキ"],
-    bait:["アカムシ","小さく切ったイソメ","サシ"],
-    lures:[],
-    food:"唐揚げ／素揚げ／かき揚げ"
-  },
-  "コイ": {
-    season:"通年（春〜秋は活性高）",
-    time:"日中（朝夕◎）",
-    shelf:"表層〜中層（ヨレ・ワンド）",
-    methods:["ウキ","ミャク釣り","パン撒き"],
-    bait:["パン","コーン","練り餌"],
-    lures:[],
-    food:"—（基本リリース推奨）"
-  },
-  "フナ": {
-    season:"通年（春先活性↑）",
-    time:"日中",
-    shelf:"中層（カケ上がり・杭周り）",
-    methods:["ウキ"],
-    bait:["練り餌","コーン"],
-    lures:[],
-    food:"甘露煮／唐揚げ（地域差）"
-  },
-  "ヘラブナ": {
-    season:"通年（春〜秋）",
-    time:"日中",
-    shelf:"中層（タナ合わせが要）",
-    methods:["ウキ"],
-    bait:["ヘラ用配合餌"],
-    lures:[],
-    food:"—（遊魚対象・リリース推奨）"
-  },
-  "チチブ": {
-    season:"夏〜秋",
-    time:"日中",
-    shelf:"底（護岸キワ）",
-    methods:["ミャク釣り","小ウキ"],
-    bait:["イソメ小さめ","エビ身"],
-    lures:[],
-    food:"唐揚げ（小型は観察・リリース推奨）"
-  },
-  "ソウギョ": {
-    season:"春〜秋",
-    time:"日中",
-    shelf:"表層〜中層（草のある岸際）",
-    methods:["ウキ","ミャク釣り"],
-    bait:["レタス/草類/パン"],
-    lures:[],
-    food:"—（外来種・リリース/自治体ルール遵守）"
-  }
+  /* 都市河川・池 追加 */
+  "テナガエビ": { season:"初夏〜盛夏", time:"日中〜夕（橋影・護岸の際）", shelf:"超浅場（敷石・杭・沈み物の際）",
+    methods:["ミャク釣り","小ウキ"], bait:["アカムシ","小さく切ったイソメ","サシ"], lures:[], food:"唐揚げ／素揚げ／かき揚げ" },
+  "コイ": { season:"通年（春〜秋は活性高）", time:"日中（朝夕◎）", shelf:"表層〜中層（ヨレ・ワンド）",
+    methods:["ウキ","ミャク釣り","パン撒き"], bait:["パン","コーン","練り餌"], lures:[], food:"—（基本リリース推奨）" },
+  "フナ": { season:"通年（春先活性↑）", time:"日中", shelf:"中層（カケ上がり・杭周り）",
+    methods:["ウキ"], bait:["練り餌","コーン"], lures:[], food:"甘露煮／唐揚げ（地域差）" },
+  "ヘラブナ": { season:"通年（春〜秋）", time:"日中", shelf:"中層（タナ合わせが要）",
+    methods:["ウキ"], bait:["ヘラ用配合餌"], lures:[], food:"—（リリース推奨）" },
+  "チチブ": { season:"夏〜秋", time:"日中", shelf:"底（護岸キワ）",
+    methods:["ミャク釣り","小ウキ"], bait:["イソメ小さめ","エビ身"], lures:[], food:"唐揚げ（小型は観察・推奨）" },
+  "ソウギョ": { season:"春〜秋", time:"日中", shelf:"表層〜中層（草のある岸際）",
+    methods:["ウキ","ミャク釣り"], bait:["レタス/草類/パン"], lures:[], food:"—（外来種・自治体ルール遵守）" }
 };
 
-// 表記ゆれ吸収（例：ハゼ>マハゼ、シーバス>フッコ、タイ>クロダイ 等）
+/* ★ 表記ゆれ吸収（ページ分離のため旧マッピングは変更） */
 const FISH_ALIAS = {
+  "シーバス（スズキ）":"スズキ",   // 表示は「シーバス（スズキ）」→解説は「スズキ」
+  "シーバス":"スズキ",             // 万一「シーバス」で入力された場合もカバー
   "ハゼ":"マハゼ",
   "アナゴ":"マアナゴ",
   "コチ":"マゴチ",
-  "シーバス":"フッコ",
-  "小型シーバス":"セイゴ",
-  "タイ":"クロダイ"
+  "小型シーバス":"セイゴ"
 };
 function book(f){ return FISH_BOOK[FISH_ALIAS[f]||f] || {}; }
 
-// ▲▲ ここまで置換 ▲▲
+/* ===== ここまでが Part 1/3 ===== */
 </script>
-/* ★ 魚種エイリアス：表示はそのまま、解説は別名に寄せる */
-const FISH_ALIAS = {
-  "ハゼ":"マハゼ",
-  "アナゴ":"マアナゴ",
-  "コチ":"マゴチ",
-  "シーバス":"フッコ"
-};
-function book(f){ return FISH_BOOK[FISH_ALIAS[f]||f] || {}; }
+<script>
+/* ===== Part 2/3：釣り場カテゴリごとの対応釣法 & 釣り場DB（東京都） ===== */
 
-/* ===== カテゴリ別：場所で使用可にしておく釣法プリセット ===== */
-const M_BASE_GOGAN = ["サビキ","ロケットサビキ","ウキ","小ウキ","ちょい投げ","投げ","ミャク釣り","胴突き","ブラクリ","ヘチ・落とし込み","ぶっこみ","フカセ","ルアー","ルアー(軽量)","ジギング","テンヤ","ワインド","エレベーター","エギング"];
-const M_BASE_RIVER = ["ウキ","小ウキ","ミャク釣り","ちょい投げ","胴突き","ぶっこみ","ヘチ・落とし込み","ルアー","ルアー(軽量)","フカセ"];
+/* カテゴリ別：場所で使用可にしておく釣法プリセット */
+const M_BASE_GOGAN   = ["サビキ","ロケットサビキ","ウキ","小ウキ","ちょい投げ","投げ","ミャク釣り","胴突き","ブラクリ","ヘチ・落とし込み","ぶっこみ","フカセ","ルアー","ルアー(軽量)","ジギング","テンヤ","ワインド","エレベーター","エギング"];
+const M_BASE_RIVER   = ["ウキ","小ウキ","ミャク釣り","ちょい投げ","胴突き","ぶっこみ","ヘチ・落とし込み","ルアー","ルアー(軽量)","フカセ"];
 const M_BASE_ESTUARY = ["ウキ","ちょい投げ","胴突き","ぶっこみ","ヘチ・落とし込み","フカセ","ルアー","ルアー(軽量)","ジギング","エレベーター"];
-const M_BASE_SURF = ["ちょい投げ","投げ","ぶっこみ","ルアー","ジギング","エレベーター"];
+const M_BASE_SURF    = ["ちょい投げ","投げ","ぶっこみ","ルアー","ジギング","エレベーター"];
 
-/* ===== 釣り場DB（東京都：ご要望分を追加） ===== */
+/* 釣り場DB（東京都） */
 const DB = [
-  /* 既存 */
+  /* 既存＋修正：シーバス（スズキ）を含む箇所はフッコ・セイゴも併記 */
+
+  /* 東京｜護岸 / 堤防（運河・ふ頭・人工磯を含む） */
   { id:"wakasu", pref:"東京都", city:"江東区", name:"若洲海浜公園（海釣り施設・人工磯）",
     address:"江東区若洲3丁目",
     map:"https://maps.google.com/?q=%E8%8B%A5%E6%B4%B2%E6%B5%B7%E6%BF%B1%E5%85%AC%E5%9C%92%20%E6%B5%B7%E9%87%A3%E3%82%8A%E6%96%BD%E8%A8%AD",
     zones:[
-      {type:"堤防", fishes:["アジ","イシモチ","コノシロ","メバル","カサゴ","シーバス","サバ","サヨリ"]},
-      {type:"テトラ/人工磯", fishes:["カサゴ","メバル","シーバス"]}
+      {type:"堤防", fishes:["アジ","イシモチ","コノシロ","メバル","カサゴ","シーバス（スズキ）","フッコ","セイゴ","サバ","サヨリ"]},
+      {type:"テトラ/人工磯", fishes:["カサゴ","メバル","シーバス（スズキ）","フッコ","セイゴ"]}
     ],
     methods:M_BASE_GOGAN,
     memo:"柵・売店・トイレあり。混雑多め／ライジャケ推奨。"
@@ -669,7 +309,7 @@ const DB = [
   { id:"toyosu-gururi", pref:"東京都", city:"江東区", name:"豊洲ぐるり公園（護岸）",
     address:"江東区豊洲6丁目ほか",
     map:"https://maps.google.com/?q=%E8%B1%8A%E6%B4%B2%E3%81%90%E3%82%8B%E3%82%8A%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["ハゼ","シーバス","メバル","カサゴ","クロダイ","サヨリ","コノシロ"]} ],
+    zones:[ {type:"護岸", fishes:["ハゼ","メバル","カサゴ","クロダイ","サヨリ","コノシロ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_GOGAN,
     memo:"禁止区画あり・撒き餌やロケット天秤禁止／歩行者最優先。"
   },
@@ -680,84 +320,85 @@ const DB = [
     methods:M_BASE_GOGAN,
     memo:"立入・釣り禁止区画あり／海上公園は投げ原則禁止（アンダー推奨）。"
   },
-
-  /* 追加：東京｜護岸 / 堤防 */
   { id:"keihin-tsubasa", pref:"東京都", city:"大田区", name:"京浜島つばさ公園（第一〜第二護岸）",
     address:"大田区京浜島2丁目",
     map:"https://www.google.com/maps?q=%E4%BA%AC%E6%B5%9C%E5%B3%B6%E3%81%A4%E3%81%B0%E3%81%95%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["シーバス","カレイ","メバル","ハゼ","サヨリ"]} ],
+    zones:[ {type:"護岸", fishes:["シーバス（スズキ）","フッコ","セイゴ","カレイ","メバル","ハゼ","サヨリ"]} ],
     methods:M_BASE_GOGAN,
     memo:"柵あり・足場良好。海上公園ルール順守。"
   },
   { id:"keihin-unkou-ryokudo", pref:"東京都", city:"品川区/大田区", name:"京浜運河緑道公園（臨海部運河護岸）",
     address:"品川区東海〜大田区八潮",
     map:"https://www.google.com/maps?q=%E4%BA%AC%E6%B5%9C%E9%81%8B%E6%B2%B3%E7%B7%91%E9%81%93%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["シーバス","クロダイ","ハゼ"]} ],
+    zones:[ {type:"護岸", fishes:["シーバス（スズキ）","フッコ","セイゴ","クロダイ","ハゼ"]} ],
     methods:M_BASE_GOGAN,
     memo:"投げ釣り不可。掲示の“釣り可エリア”要確認。"
   },
   { id:"harumibashi", pref:"東京都", city:"江東区", name:"春海橋公園（ガスの科学館前の限定区間）",
     address:"江東区豊洲2〜3丁目",
     map:"https://www.google.com/maps?q=%E6%98%A5%E6%B5%B7%E6%A9%8B%E5%85%AC%E5%9C%92+%E9%87%A3%E3%82%8A",
-    zones:[ {type:"護岸", fishes:["シーバス","クロダイ","ハゼ","カレイ"]} ],
+    zones:[ {type:"護岸", fishes:["シーバス（スズキ）","フッコ","セイゴ","クロダイ","ハゼ","カレイ"]} ],
     methods:M_BASE_GOGAN,
     memo:"釣り可は約150mのみ／投げ・撒き餌禁止。"
   },
   { id:"shibaura-minami", pref:"東京都", city:"港区", name:"芝浦南ふ頭公園（レインボーブリッジ下）",
     address:"港区港南5丁目",
     map:"https://www.google.com/maps?q=%E8%8A%9D%E6%B5%A6%E5%8D%97%E3%81%B5%E9%A0%AD%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["アジ","コノシロ","ハゼ","シーバス","クロダイ"]} ],
+    zones:[ {type:"護岸", fishes:["アジ","コノシロ","ハゼ","クロダイ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_GOGAN,
     memo:"投げ禁止・ルアー制限の掲示あり。現地ルール厳守。"
   },
   { id:"shinonome", pref:"東京都", city:"江東区", name:"東雲水辺公園（運河護岸）",
     address:"江東区東雲1丁目",
     map:"https://maps.google.com/?q=%E6%9D%B1%E9%9B%B2%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["ハゼ","シーバス","カレイ","マアナゴ"]} ],
+    zones:[ {type:"護岸", fishes:["ハゼ","カレイ","マアナゴ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_GOGAN,
     memo:"風裏になりやすい／トイレあり・駐車場なし。"
   },
   { id:"sunamachi-canal", pref:"東京都", city:"江東区", name:"砂町運河（夢の島緑道公園側 護岸）",
     address:"江東区夢の島3丁目",
     map:"https://maps.google.com/?q=%E7%A0%82%E7%94%BA%E9%81%8B%E6%B2%B3+%E5%A4%A2%E3%81%AE%E5%B3%B6%E7%B7%91%E9%81%93%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["シーバス"]} ],
+    zones:[ {type:"護岸", fishes:["シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_GOGAN,
     memo:"新木場至近。夜間は足元・治安に注意。"
   },
   { id:"omori-hometown", pref:"東京都", city:"大田区", name:"大森ふるさとの浜辺公園（護岸・磯）",
     address:"大田区大森東2丁目",
-    map:"https://maps.google.com/?q=%E5%A4%A7%E6%A3%AE%E3%81%B5%E3%82%8B%E3%81%95%E3%81%A8%E3%81%AE%E6%B5%9C%E8%BE%BA%E5%85%AC%E5%9C%92",
-    zones:[ {type:"護岸", fishes:["ハゼ","シーバス"]}, {type:"磯", fishes:["ハゼ","シーバス"]} ],
+    map:"https://maps.google.com/?q=%E5%A4%A7%E6%A3%AE%E3%81%B5%E3%82%8B%E3%81%95%E3%81%A8%E3%81%AE%E6%B5%B7%E8%BE%BA%E5%85%AC%E5%9C%92",
+    zones:[
+      {type:"護岸", fishes:["ハゼ","シーバス（スズキ）","フッコ","セイゴ"]},
+      {type:"磯",   fishes:["ハゼ","シーバス（スズキ）","フッコ","セイゴ"]}
+    ],
     methods:M_BASE_GOGAN,
     memo:"砂浜は釣り禁止／両端の磯や護岸のみ可。リール投げ禁止。"
   },
 
-  /* 東京｜河口付近 */
+  /* 東京｜河口付近（河川最下流〜海への出口周辺） */
   { id:"sunamachi-mizube", pref:"東京都", city:"江東区", name:"砂町水辺公園（荒川下流・江東区側）",
     address:"東砂7〜8丁目（荒川沿い）",
     map:"https://maps.google.com/?q=%E7%A0%82%E7%94%BA%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
-    zones:[ {type:"河口（ゴロタ）", fishes:["ハゼ","シーバス","クロダイ","ボラ"]} ],
+    zones:[ {type:"河口（ゴロタ）", fishes:["ハゼ","クロダイ","ボラ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"ゴロタで根掛かり・滑り注意／トイレ点在。"
   },
   { id:"arakawa-estuary", pref:"東京都", city:"江東区", name:"荒川河口（清砂大橋〜新砂水辺公園・新砂RS）",
     address:"清砂〜新砂",
     map:"https://maps.google.com/?q=%E6%B8%85%E7%A0%82%E5%A4%A7%E6%A9%8B%20%E6%96%B0%E7%A0%82%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
-    zones:[ {type:"河口（ゴロタ）", fishes:["シーバス","クロダイ","ハゼ"]} ],
+    zones:[ {type:"河口（ゴロタ）", fishes:["クロダイ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"ゴロタ護岸。潮の動き出しと橋脚明暗が鍵。"
   },
   { id:"shinsuna-rs", pref:"東京都", city:"江東区", name:"清砂大橋下〜新砂リバーステーション",
     address:"江東区新砂1〜東砂8",
     map:"https://www.google.com/maps?q=%E6%B8%85%E7%A0%82%E5%A4%A7%E6%A9%8B",
-    zones:[ {type:"河口", fishes:["クロダイ","シーバス","ハゼ"]} ],
+    zones:[ {type:"河口", fishes:["クロダイ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"カニ餌のチニング実績／足場不安定区間あり。"
   },
   { id:"old-edogawa-mouth", pref:"東京都", city:"江戸川区", name:"旧江戸川 河口西岸（臨海町護岸）",
     address:"江戸川区臨海町6丁目周辺",
     map:"https://www.google.com/maps?q=%E6%97%A7%E6%B1%9F%E6%88%B8%E5%B7%9D+%E6%B2%B3%E5%8F%A3+%E8%87%A8%E6%B5%B7%E7%94%BA",
-    zones:[ {type:"河口", fishes:["シーバス","サッパ","ハゼ","クロダイ"]} ],
+    zones:[ {type:"河口", fishes:["サッパ","ハゼ","クロダイ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"橋脚・常夜灯の明暗が強い／休日は混雑。"
   },
@@ -778,19 +419,19 @@ const DB = [
   { id:"kandagawa-mouth", pref:"東京都", city:"台東区/中央区", name:"神田川河口・柳橋（隅田川合流）",
     address:"台東区柳橋〜中央区東日本橋",
     map:"https://maps.google.com/?q=%E6%9F%B3%E6%A9%8B+%E7%A5%9E%E7%94%B0%E5%B7%9D",
-    zones:[ {type:"河口", fishes:["シーバス","カレイ","ウナギ","ハゼ"]} ],
+    zones:[ {type:"河口", fishes:["カレイ","ウナギ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"屋形船・遊覧船の航行が多い。安全最優先。"
   },
   { id:"sunamachi-tennis", pref:"東京都", city:"江東区", name:"砂町庭球場前護岸（荒川・東砂）",
     address:"江東区東砂7〜8丁目",
     map:"https://maps.google.com/?q=%E7%A0%82%E7%94%BA%E5%BA%AD%E7%90%83%E5%A0%B4",
-    zones:[ {type:"河口", fishes:["セイゴ","ハゼ"]} ],
+    zones:[ {type:"河口", fishes:["小型シーバス","ハゼ"]} ],
     methods:M_BASE_ESTUARY,
     memo:"足場高く落水リスク／赤エイ情報あり。"
   },
 
-  /* 東京｜川・運河等 */
+  /* 東京｜川（中・下流の河川・運河・親水公園・水門・橋脚など） */
   { id:"kyunakagawa", pref:"東京都", city:"江東区/江戸川区", name:"旧中川（東大島駅〜中川大橋）",
     address:"東大島周辺",
     map:"https://maps.google.com/?q=%E6%97%A7%E4%B8%AD%E5%B7%9D%20%E6%9D%B1%E5%A4%A7%E5%B3%B6",
@@ -801,7 +442,7 @@ const DB = [
   { id:"hirai-undo", pref:"東京都", city:"江戸川区", name:"平井運動公園（荒川右岸×旧中川合流域）",
     address:"江戸川区平井荒川グラウンド",
     map:"https://maps.google.com/?q=%E5%B9%B3%E4%BA%95%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92%20%E8%8D%92%E5%B7%9D",
-    zones:[ {type:"河川護岸/橋脚", fishes:["シーバス","ハゼ","コイ","ウナギ"]} ],
+    zones:[ {type:"河川護岸/橋脚", fishes:["コイ","ウナギ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"河川敷Pは土日祝のみ開放／簡易トイレ中心。"
   },
@@ -822,14 +463,14 @@ const DB = [
   { id:"old-edogawa-shinozaki", pref:"東京都", city:"江戸川区", name:"旧江戸川（篠崎緑地A〜B／篠崎水門周辺）",
     address:"上篠崎・篠崎町",
     map:"https://www.google.com/maps?q=%E7%AF%A0%E5%B4%8E%E7%B7%91%E5%9C%B0+%E6%97%A7%E6%B1%9F%E6%88%B8%E5%B7%9D",
-    zones:[ {type:"河川", fishes:["ハゼ","シーバス","クロダイ","コイ"]} ],
+    zones:[ {type:"河川", fishes:["ハゼ","クロダイ","コイ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"落ちハゼ期◎。長い護岸で分散しやすい。"
   },
   { id:"arakawa-lockgate", pref:"東京都", city:"江戸川区", name:"荒川ロックゲート（旧中川連絡水門）",
     address:"小松川1-1地先",
     map:"https://www.google.com/maps?q=%E8%8D%92%E5%B7%9D%E3%83%AD%E3%83%83%E3%82%AF%E3%82%B2%E3%83%BC%E3%83%88",
-    zones:[ {type:"水門/明暗", fishes:["シーバス","クロダイ","ハゼ"]} ],
+    zones:[ {type:"水門/明暗", fishes:["クロダイ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"明暗と反転流を撃つ。フェンスありで足場良。"
   },
@@ -843,7 +484,7 @@ const DB = [
   { id:"sumidagawa-terrace", pref:"東京都", city:"中央区/江東区", name:"隅田川テラス（新大橋〜清洲橋 左岸）",
     address:"新大橋〜清洲橋",
     map:"https://www.google.com/maps?q=%E9%9A%85%E7%94%B0%E5%B7%9D+%E6%96%B0%E5%A4%A7%E6%A9%8B",
-    zones:[ {type:"テラス", fishes:["ハゼ","シーバス"]} ],
+    zones:[ {type:"テラス", fishes:["ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"テラスは投げ込み不可が基本。安全最優先でアンダー主体。"
   },
@@ -864,14 +505,14 @@ const DB = [
   { id:"horikiri-mizube", pref:"東京都", city:"葛飾区", name:"堀切水辺公園（荒川左岸・堀切橋周辺）",
     address:"堀切1〜2丁目",
     map:"https://maps.google.com/?q=%E5%A0%80%E5%88%87%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
-    zones:[ {type:"河川", fishes:["シーバス","マゴチ","コイ","タイ","ハゼ"]} ],
+    zones:[ {type:"河川", fishes:["マゴチ","コイ","タイ","ハゼ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"駅徒歩圏。段差・滑りに注意。"
   },
   { id:"kinegawa-bashi", pref:"東京都", city:"葛飾区", name:"木根川橋（荒川・綾瀬川合流）",
     address:"東四つ木付近",
     map:"https://maps.google.com/?q=%E6%9C%A8%E6%A0%B9%E5%B7%9D%E6%A9%8B",
-    zones:[ {type:"河川", fishes:["ソウギョ","コイ","シーバス","ウナギ"]} ],
+    zones:[ {type:"河川", fishes:["ソウギョ","コイ","ウナギ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"浅場多く、ウェーディング適所あり。"
   },
@@ -885,259 +526,347 @@ const DB = [
   { id:"iwabuchi-sluice", pref:"東京都", city:"北区", name:"岩淵水門（旧岩淵水門〜中ノ島）",
     address:"北区岩淵町",
     map:"https://maps.google.com/?q=%E5%B2%A9%E6%B7%B5%E6%B0%B4%E9%96%80",
-    zones:[ {type:"水門/島周り", fishes:["テナガエビ","シーバス","ハゼ","ウナギ","コイ"]} ],
+    zones:[ {type:"水門/島周り", fishes:["テナガエビ","ハゼ","ウナギ","コイ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"桟橋や島周りの地形変化を狙う。滑り・転落注意。"
   },
   { id:"shinarakawa-ohashi", pref:"東京都", city:"北区/足立区", name:"新荒川大橋（北区／足立区境）",
     address:"北区神谷〜足立区新田",
     map:"https://maps.google.com/?q=%E6%96%B0%E8%8D%92%E5%B7%9D%E5%A4%A7%E6%A9%8B",
-    zones:[ {type:"橋脚/河川", fishes:["テナガエビ","ハゼ","チチブ","シーバス"]} ],
+    zones:[ {type:"橋脚/河川", fishes:["テナガエビ","ハゼ","チチブ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"船舶通行多い。仕掛け回収はこまめに。"
   },
   { id:"shikahama-bashi", pref:"東京都", city:"足立区", name:"鹿浜橋（荒川）",
     address:"足立区鹿浜",
     map:"https://maps.google.com/?q=%E9%B9%BF%E6%B5%9C%E6%A9%8B",
-    zones:[ {type:"橋脚/河川", fishes:["ハゼ","シーバス","ウナギ"]} ],
+    zones:[ {type:"橋脚/河川", fishes:["ハゼ","ウナギ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_RIVER,
     memo:"橋脚の明暗が分かれ目。深夜帯はマナー徹底。"
   },
 
-  /* 東京｜サーフ */
+  /* 東京｜サーフ（砂浜） */
   { id:"kasai-kaisui", pref:"東京都", city:"江戸川区", name:"葛西海浜公園（西なぎさ・外海側の指定区間）",
     address:"臨海町6丁目付近",
     map:"https://www.google.com/maps?q=%E8%91%9B%E8%A5%BF%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92+%E8%A5%BF%E3%81%AA%E3%81%8E%E3%81%95",
-    zones:[ {type:"サーフ", fishes:["ハゼ","カレイ","シーバス","クロダイ"]} ],
+    zones:[ {type:"サーフ", fishes:["ハゼ","カレイ","クロダイ","シーバス（スズキ）","フッコ","セイゴ"]} ],
     methods:M_BASE_SURF,
     memo:"釣り可エリアは限定／投げ・フルキャスト不可。アンダー主体で安全第一。"
   }
 ];
 
-/* 都道府県一覧 */
-const PREFS = [...new Set(DB.map(p=>p.pref))];
+/* ===== Part 2/3 ここまで ===== */
+</script>
+<script>
+/* ===== Part 3/3：描画・遷移・LIFF初期化 ===== */
 
-/* ===== 状態 & ステップ ===== */
-const state = { step:0, pref:null, placeId:null, zoneIdx:null, fish:null, subMethod:null };
-const stepsTitle = ["都道府県","釣り場","ポイント種別","魚種","結果"];
+const app = document.getElementById('app');
+const stepsEl = document.getElementById('steps');
+const backBtn = document.getElementById('back');
+const hello = document.getElementById('hello');
 
-function setSteps(){
-  const s = document.getElementById('steps');
-  s.innerHTML = stepsTitle.map((t,i)=>`<div class="step ${i<=state.step?'on':''}">${i+1}. ${t}</div>`).join('');
-  document.getElementById('back').hidden = state.step===0;
+const state = { pref:null, spot:null, zoneIdx:null, fish:null, method:null };
+const hist = [];
+
+function push() { hist.push(JSON.stringify(state)); }
+function goBack(){
+  if(!hist.length) return;
+  const prev = JSON.parse(hist.pop());
+  Object.assign(state, prev);
+  render();
+}
+window.goBack = goBack;
+
+function setSteps(phase){
+  const steps = [
+    {id:"pref", label:"都道府県"},
+    {id:"spot", label:"釣り場"},
+    {id:"zone", label:"ポイント"},
+    {id:"fish", label:"魚種"},
+    {id:"rig",  label:"仕掛け"}
+  ];
+  stepsEl.innerHTML = steps.map(s=>`<div class="step ${s.id===phase?'on':''}">${s.label}</div>`).join('');
+  backBtn.hidden = (hist.length===0);
 }
 
-/* ===== 描画 ===== */
-function render(){
-  setSteps();
-  const app = document.getElementById('app');
+function uniq(arr){ return Array.from(new Set(arr)); }
+function intersect(a,b){ const s=new Set(b); return a.filter(x=>s.has(x)); }
 
-  // 0: 都道府県
-  if(state.step===0){
-    app.innerHTML = `<div class="hero"><strong>都道府県</strong> を選ぶと、その地域の釣り場が出ます。</div>
+function renderPref(){
+  setSteps('pref');
+  const prefs = uniq(DB.map(x=>x.pref));
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>エリアを選ぶ</h1>
+      <div class="muted">まずは都道府県から。次に釣り場 → ポイント → 魚種の順で進みます。</div>
+    </div>
     <div class="grid">
-      ${PREFS.map(p=>{
-        const n = DB.filter(d=>d.pref===p).length;
-        return `<div class="card">
+      ${prefs.map(p=>`
+        <div class="card">
           <h3>${p}</h3>
-          <p class="muted">${n} スポット</p>
-          <div class="row"><button class="pri" onclick="selPref('${p}')">この都道府県を選ぶ</button></div>
-        </div>`}).join('')}
-    </div>`;
-    return;
-  }
+          <button class="pri" onclick="pickPref('${p}')">このエリアを選ぶ</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+window.pickPref = (p)=>{
+  push();
+  state.pref = p; state.spot = null; state.zoneIdx=null; state.fish=null; state.method=null;
+  renderSpots();
+};
 
-  // 1: 釣り場（★メモ＆釣果例を追加表示）
-  if(state.step===1){
-    const list = DB.filter(d=>d.pref===state.pref);
-    app.innerHTML = `<div class="grid">
-      ${list.map(d=>{
-        const fishes = [...new Set((d.zones||[]).flatMap(z=>z.fishes))].slice(0,8).join("、");
-        return `<div class="card">
-          <h3>${d.name}</h3>
-          <div class="kv"><span>${d.pref} ${d.city||""}</span><span>${d.address||""}</span></div>
-          <p class="muted">釣果例：${fishes||'—'}</p>
-          ${d.memo?`<div class="memo">一口メモ・注意事項：${d.memo}</div>`:''}
-          <div class="row" style="margin-top:8px">
-            <button class="ghost" onclick="openMap('${d.id}')">地図を開く</button>
-            <button class="pri" onclick="selPlace('${d.id}')">ここを選ぶ</button>
+function renderSpots(){
+  setSteps('spot');
+  const list = DB.filter(x=>x.pref===state.pref);
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>${state.pref} の釣り場</h1>
+      <div class="muted">カードの「選ぶ」で進みます。<br>各カードには「一口メモ・注意事項」を表示しています。</div>
+    </div>
+    <div class="grid">
+      ${list.map(s=>`
+        <div class="card">
+          <h3>${s.name}</h3>
+          <div class="muted">${s.address||''}</div>
+          <div class="kv">
+            ${uniq(s.zones.flatMap(z=>z.fishes)).slice(0,6).map(f=>`<span>${f}</span>`).join('')}
           </div>
-        </div>`}).join('')}
-    </div>`;
-    return;
-  }
-
-  // 2: ポイント種別
-  if(state.step===2){
-    const p = getPlace();
-    app.innerHTML = `
-      <div class="card">
-        <h3>${p.name}｜ポイントを選ぶ</h3>
-        <div class="chips">
-          ${p.zones.map((z,idx)=>`<button class="chip" onclick="selZone(${idx})">${z.type}</button>`).join('')}
+          <div class="memo">📝 ${s.memo||'—'}</div>
+          <div class="row" style="margin-top:10px">
+            <a class="ghost chip" href="${s.map}" target="_blank">地図を開く</a>
+            <button class="pri" onclick="pickSpot('${s.id}')">選ぶ</button>
+          </div>
         </div>
-      </div>`;
-    return;
+      `).join('')}
+    </div>
+  `;
+}
+window.pickSpot = (id)=>{
+  push();
+  state.spot = DB.find(x=>x.id===id);
+  state.zoneIdx = null; state.fish=null; state.method=null;
+  if((state.spot?.zones||[]).length===1){
+    state.zoneIdx = 0;
+    renderFish();
+  }else{
+    renderZones();
   }
+};
 
-  // 3: 魚種
-  if(state.step===3){
-    const z = getZone();
-    app.innerHTML = `
-      <div class="card">
-        <h3>${getPlace().name}｜${z.type}｜魚種を選ぶ</h3>
-        <div class="chips">
-          ${z.fishes.map(f=>`<button class="chip" onclick="selFish('${f}')">${f}</button>`).join('')}
+function renderZones(){
+  setSteps('zone');
+  const z = state.spot.zones;
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>${state.spot.name} のポイント種類</h1>
+      <div class="muted">堤防／テトラ／サーフ／河口などから選んでください。</div>
+    </div>
+    <div class="grid">
+      ${z.map((zz,i)=>`
+        <div class="card">
+          <h3>${zz.type}</h3>
+          <div class="kv">${zz.fishes.map(f=>`<span>${f}</span>`).join('')}</div>
+          <button class="pri" onclick="pickZone(${i})">このポイントを選ぶ</button>
         </div>
-      </div>`;
-    return;
-  }
+      `).join('')}
+    </div>
+  `;
+}
+window.pickZone = (i)=>{
+  push();
+  state.zoneIdx = i; state.fish=null; state.method=null;
+  renderFish();
+};
 
-  // 4: 結果（★現地ルールは表示しない）
-  if(state.step===4){
-    app.innerHTML = renderResult();
-    return;
+function renderFish(){
+  setSteps('fish');
+  const zone = state.spot.zones[state.zoneIdx];
+  const fishes = uniq(zone.fishes);
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>魚種を選ぶ</h1>
+      <div class="muted">${state.pref} / ${state.spot.name} / ${zone.type}</div>
+    </div>
+    <div class="grid">
+      ${fishes.map(f=>`
+        <div class="card">
+          <h3>${f}</h3>
+          <div class="params">
+            ${(book(f).season?`<span class="param"><b>季節</b> ${book(f).season}</span>`:'')}
+            ${(book(f).time?`<span class="param"><b>時間帯</b> ${book(f).time}</span>`:'')}
+          </div>
+          <button class="pri" onclick="pickFish('${f.replace(/'/g,"\\'")}')">この魚を狙う</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+window.pickFish = (f)=>{
+  push();
+  state.fish = f; state.method=null;
+  renderRig();
+};
+
+function allowedMethodsFor(fish){
+  const zone = state.spot.zones[state.zoneIdx];
+  const fishInfo = book(fish);
+  const base = zone ? state.spot.methods : [];
+  // 場所 × 魚のインターセクション（できない釣法は自動で非表示）
+  let allowed = intersect(base, fishInfo.methods||[]);
+  // 追加の気遣い：カサゴ・メバルなど根魚で「ルアー」選択時にロック系も候補扱い
+  if((/カサゴ|アイナメ|メバル/).test(fish) && base.includes("ルアー") && !allowed.includes("ルアー")){
+    allowed.push("ルアー");
   }
+  return uniq(allowed);
 }
 
-function renderResult(){
-  const p = getPlace(), z = getZone(), f = state.fish;
-  const info = book(f);
-  const placeMethods = (p.methods||[]);
-  const allowed = (info.methods||[]).filter(m => placeMethods.includes(m));
-  if(!state.subMethod) state.subMethod = allowed[0] || null;
+function renderRig(){
+  setSteps('rig');
+  const zone = state.spot.zones[state.zoneIdx];
+  const fish = state.fish;
+  const b = book(fish);
+  const methods = allowedMethodsFor(fish);
+  if(!methods.length){
+    app.innerHTML = `
+      <div class="card hero"><h1>${fish}</h1>
+      <div class="muted">このポイントでは推奨できる釣り方が見つかりませんでした。</div></div>
+      <div class="card"><button class="ghost" onclick="goBack()">戻る</button></div>
+    `;
+    return;
+  }
+  if(!state.method) state.method = methods[0];
 
-  const fimg = fishImg(f);
-  const rimg = rigImg(f, state.subMethod);
+  const rigImgs = rigImg(fish, state.method);
+  const fishImageUrl = fishImg(fish);
 
-  const params = `
-    <div class="params">
-      <div class="param"><b>シーズン</b> ${info.season||"—"}</div>
-      <div class="param"><b>時間帯</b> ${info.time||"—"}</div>
-    </div>`;
+  const params = [
+    b.season?`<span class="param"><b>シーズン</b> ${b.season}</span>`:"",
+    b.time?`<span class="param"><b>時間帯</b> ${b.time}</span>`:"",
+    b.shelf?`<span class="param"><b>棚</b> ${b.shelf}</span>`:""
+  ].join('');
 
-  const methodChips = `
-    <div class="chips method-chips">
-      ${allowed.map(m=>`<button class="chip ${m===state.subMethod?'on':''}" onclick="pickMethod('${m}')">${m}</button>`).join('') || '<p class="muted">この場所で推奨される釣法データが未設定です</p>'}
-    </div>`;
+  // 部材（メソッド基準＋魚基準）
+  const gearKeywords = uniq([...(METHOD_GEAR[state.method]||[]), ...((b.gear)||[])]);
+  // 餌・撒き餌
+  const baitList = uniq([...(b.bait||[]), ...(BAIT_BY_METHOD[state.method]||[])]);
+  // ルアー
+  const lureList = uniq([...(b.lures||[])]);
 
-  const gearWords = new Set([...(info.gear||[])]);
-  (METHOD_GEAR[state.subMethod]||[]).forEach(w=>gearWords.add(w));
-  const gearList = [...gearWords].slice(0,6);
-
-  const baitWords = new Set([...(info.bait||[])]);
-  (BAIT_BY_METHOD[state.subMethod]||[]).forEach(w=>baitWords.add(w));
-  const baitList = [...baitWords];
-
-  const lureList = info.lures||[];
-
-  return `
-  <div class="card">
-    <div class="sectionTitle">指定した魚画像 ↓</div>
-    <img class="banner" src="${fimg}" alt="${f}" onerror="this.onerror=null;this.src='${FISH_IMG_FALLBACK}';">
-
-    <div class="sectionTitle">仕掛けイラスト ↓</div>
-    <img class="banner" src="${rimg.specific}" alt="${state.subMethod||''} rig"
-         onerror="if(this.src.indexOf('rig-')>-1){this.src='${rimg.generic}';this.onerror=function(){this.src='${rimg.placeholder}';}}">
-
-    <h3 style="margin-top:10px">${p.name}</h3>
-    <div class="kv"><span>${z.type}</span><span>魚種：${f}</span></div>
-    ${params}
-
-    <div class="sectionTitle">この場所での推奨釣り方（切り替え可）</div>
-    ${methodChips}
-
-    <div class="sectionTitle">オススメ部材 ↓</div>
-    ${gearList.length?`<ul class="items">
-      ${gearList.map(w=>`<li>${w}
-        <div class="shops">
-          <a class="shop" href="#" onclick="ext('${linkAmazon(w)}')">Amazon</a>
-          <a class="shop" href="#" onclick="ext('${linkRakuten(w)}')">楽天</a>
-        </div>
-      </li>`).join('')}
-    </ul>`:'<p class="muted">準備中</p>'}
-
-    <div class="sectionTitle">餌・撒き餌のオススメ ↓</div>
-    ${baitList.length?`<ul class="items">
-      ${baitList.map(w=>`<li>${w}
-        <div class="shops">
-          <a class="shop" href="#" onclick="ext('${linkAmazon(w)}')">Amazon</a>
-          <a class="shop" href="#" onclick="ext('${linkRakuten(w)}')">楽天</a>
-        </div>
-      </li>`).join('')}
-    </ul>`:'<p class="muted">準備中</p>'}
-
-    ${lureList.length?`<div class="sectionTitle">ルアー候補 ↓</div>
-      <ul class="items">
-        ${lureList.map(w=>`<li>${w}
-          <div class="shops">
-            <a class="shop" href="#" onclick="ext('${linkAmazon(w)}')">Amazon</a>
-            <a class="shop" href="#" onclick="ext('${linkRakuten(w)}')">楽天</a>
-          </div>
-        </li>`).join('')}
-      </ul>`:''}
-
-    <div class="sectionTitle">棚、狙い目 ↓</div>
-    <p>${(book(f).shelf)||p.shelf||'—'}</p>
-
-    <div class="sectionTitle">おすすめ時間帯 ↓</div>
-    <p>${(book(f).time)||p.times||'—'}</p>
-
-    <div class="sectionTitle">場所と友だち共有</div>
-    <div class="row" style="margin-top:6px">
-      <button class="ghost" onclick="openMap('${p.id}')">場所を地図で確認</button>
-      <button class="pri" onclick="share()">友だちに共有</button>
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>${fish} を狙う</h1>
+      <div class="muted">${state.pref} / ${state.spot.name} / ${zone.type}</div>
+      <div class="params">${params}</div>
     </div>
 
-    <p class="cap">食べ方ヒント：${(book(f).food)||'—'}</p>
-  </div>`;
+    <div class="card">
+      <h3>指定した魚画像</h3>
+      <img class="banner" src="${fishImageUrl}" onerror="this.src='${FISH_IMG_FALLBACK}'" alt="${fish}">
+      <div class="cap">※画像はダミーです。<code>img/fish-${toSlug(fish)}.png</code> を置くと差し替わります。</div>
+    </div>
+
+    <div class="card">
+      <h3>仕掛けイラスト（${state.method}）</h3>
+      <img class="banner" src="${rigImgs.specific}"
+           onerror="this.onerror=null;this.src='${rigImgs.generic}';this.onerror=()=>{this.src='${rigImgs.placeholder}'}" alt="rig">
+      <div class="cap">※<code>img/rig-${toSlug(fish)}-${toSlug(state.method)}.png</code> が無い場合は
+        <code>img/rig-${toSlug(state.method)}.png</code> → プレースホルダの順に表示します。</div>
+      <div class="sectionTitle">釣り方を切り替える</div>
+      <div class="chips method-chips">
+        ${methods.map(m=>`<button class="chip ${m===state.method?'on':''}" onclick="setMethod('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>オススメ部材</h3>
+      ${gearKeywords.length? `<ul class="items">`+gearKeywords.map(k=>`
+          <li>
+            ${k}
+            <div class="shops">
+              <a class="shop" target="_blank" href="${linkAmazon(k)}">Amazon</a>
+              <a class="shop" target="_blank" href="${linkRakuten(k)}">楽天</a>
+            </div>
+          </li>`).join('')+`</ul>` : `<div class="muted">この釣り方の代表的な部材が見つかりませんでした。</div>`}
+    </div>
+
+    <div class="card">
+      <h3>餌・コマセ（& 補助）</h3>
+      ${baitList.length? `<ul class="items">`+baitList.map(x=>`<li>${x}</li>`).join('')+`</ul>` : `<div class="muted">—</div>`}
+      ${lureList.length? `
+        <div class="sectionTitle">ルアー候補</div>
+        <ul class="items">`+lureList.map(x=>`<li>${x}</li>`).join('')+`</ul>
+      `:""}
+    </div>
+
+    <div class="card">
+      <h3>棚・狙い目</h3>
+      <div>${b.shelf || '—'}</div>
+      <div class="sectionTitle">オススメ時間帯</div>
+      <div>${b.time || '—'}</div>
+      <div class="sectionTitle">食べ方ヒント</div>
+      <div>${b.food || '—'}</div>
+    </div>
+
+    <div class="card">
+      <h3>場所と友だち共有</h3>
+      <div class="row">
+        <a class="ghost chip" href="${state.spot.map}" target="_blank">📍 地図を開く</a>
+        <button class="pri" onclick="sharePlan()">LINEで共有する</button>
+      </div>
+      <div class="cap">※共有テキストに 釣り場／ポイント／魚種／釣り方／地図URL を含めます。</div>
+    </div>
+  `;
 }
 
-/* ===== ハンドラ ===== */
-function getPlace(){ return DB.find(p=>p.id===state.placeId); }
-function getZone(){ const p = getPlace(); return p?.zones?.[state.zoneIdx]; }
-function openWin(url){ return liff.isInClient()? liff.openWindow({url, external:true}) : window.open(url,'_blank'); }
-function openMap(pid){ const url = DB.find(p=>p.id===pid).map; openWin(url); }
-function ext(url){ openWin(url); }
+window.setMethod = (m)=>{ push(); state.method = m; renderRig(); };
 
-function selPref(p){ state.pref=p; state.step=1; render(); }
-function selPlace(id){ state.placeId=id; state.step=2; render(); }
-function selZone(idx){ state.zoneIdx=idx; state.step=3; render(); }
-function selFish(f){ state.fish=f; state.subMethod=null; state.step=4; render(); }
-function pickMethod(m){ state.subMethod=m; document.getElementById('app').innerHTML = renderResult(); }
-
-function goBack(){
-  if(state.step===0) return;
-  if(state.step===1){ state.pref=null; }
-  if(state.step===2){ state.placeId=null; }
-  if(state.step===3){ state.zoneIdx=null; }
-  if(state.step===4){ state.fish=null; state.subMethod=null; }
-  state.step--; render();
-}
-
-/* ===== LIFF 起動 ===== */
-(async()=>{
-  await liff.init({ liffId: LIFF_ID });
-  if (liff.isInClient()){
-    if(!liff.isLoggedIn()){ liff.login({ prompt:"consent" }); return; }
-    try{
-      const p = await liff.getProfile();
-      document.getElementById('hello').textContent = `ようこそ ${p.displayName} さん`;
-    }catch{ document.getElementById('hello').textContent = "ようこそ！"; }
-  }else{
-    document.getElementById('hello').textContent = "ブラウザでプレビュー中";
+async function sharePlan(){
+  try{
+    const zone = state.spot.zones[state.zoneIdx];
+    const url = state.spot.map;
+    const txt = [
+      `🎣 RigNavi プラン共有`,
+      `場所: ${state.spot.name}（${zone.type}）`,
+      `狙い: ${state.fish}`,
+      `釣法: ${state.method}`,
+      `時合: ${book(state.fish).time||'-'}`,
+      `棚: ${book(state.fish).shelf||'-'}`,
+      `地図: ${url}`
+    ].join('\n');
+    if(window.liff && liff.isApiAvailable('shareTargetPicker')){
+      await liff.shareTargetPicker([{ type:'text', text: txt }]);
+    }else{
+      alert("LINEアプリ外のため、共有APIが使えません。テキストをコピーします。\n\n"+txt);
+      await navigator.clipboard.writeText(txt);
+    }
+  }catch(e){
+    alert("共有に失敗しました: "+(e?.message||e));
   }
-  render();
-})();
-
-async function share(){
-  if(!liff.isInClient()){ alert('共有はLINEアプリ内で開いてください'); return; }
-  const p = getPlace(), z = getZone();
-  const f = state.fish, m = state.subMethod||'';
-  const b = book(f);
-  const msg = `${p.name}\n${z.type}\n${f}${m?` × ${m}`:''}\n季節:${b.season||'-'}／時間帯:${b.time||'-'}\n棚:${b.shelf||p.shelf||'-'}\n地図:${p.map}`;
-  await liff.shareTargetPicker([{ type:'text', text: msg }]);
 }
+
+function render(){
+  if(!state.pref) return renderPref();
+  if(!state.spot) return renderSpots();
+  if(state.zoneIdx==null) return renderZones();
+  if(!state.fish) return renderFish();
+  return renderRig();
+}
+
+/* ====== LIFF 初期化 ====== */
+(async ()=>{
+  try{
+    await liff.init({ liffId: LIFF_ID });
+    if(!liff.isLoggedIn()){ liff.login(); return; }
+    const p = await liff.getProfile();
+    hello.textContent = `ようこそ ${p.displayName} さん`;
+  }catch(_){
+    // Webプレビュー用フォールバック
+    hello.textContent = "Webプレビュー（LINE外で実行中）";
+  }finally{
+    render();
+  }
+})();
 </script>
 </body>
 </html>
