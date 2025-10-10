@@ -13,7 +13,6 @@
     --glass:#ffffffc9; --line:#d8e9f3;
     --card:#ffffff; --chip:#f4faff;
     --accent:#12b6ff; --accent-ink:#013449;
-    --ok:#10b981;
   }
   *{box-sizing:border-box} html,body{height:100%}
   body{
@@ -56,16 +55,15 @@
   button.ghost{background:#fff; border:1px solid var(--line)}
   a{color:#007fb3}
   ul.items{padding-left:18px; margin:8px 0}
-  ul.items li{margin:6px 0}
-  .kv{display:flex; gap:10px; flex-wrap:wrap; margin:.5rem 0}
+  ul.items li{margin:10px 0}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin:.6rem 0}
   .kv span{background:#f6fbff; border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px}
-  .hero{
-    background:linear-gradient(135deg,#e8f7ff,#ffffff);
-    border:1px dashed var(--line); border-radius:16px; padding:12px; margin-bottom:12px;
-  }
+  .hero{background:linear-gradient(135deg,#e8f7ff,#ffffff); border:1px dashed var(--line); border-radius:16px; padding:12px; margin-bottom:12px}
   .banner{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
-  .shops{display:flex; gap:8px; flex-wrap:wrap}
-  .shop{padding:10px 12px; border-radius:10px; background:#fff; border:1px solid var(--line)}
+  .shops{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px}
+  .shop{padding:8px 10px; border-radius:10px; background:#fff; border:1px solid var(--line); font-size:14px}
+  .cap{font-size:13px; color:var(--muted); margin:4px 0 8px}
+  .sectionTitle{margin-top:12px; margin-bottom:6px; font-weight:800}
 </style>
 </head>
 <body>
@@ -88,46 +86,77 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "8";
+const VERSION = "9";
 
-/* ====== 魚種→許可釣法（ここで自動フィルタ）====== */
+/* ===== 魚種→許可釣法（自動フィルタ） ===== */
 const FISH_METHODS = {
-  "アジ": ["サビキ","ちょい投げ"],               // 「穴釣り」は出さない
-  "カサゴ": ["穴釣り","胴突き","ブラクリ"],      // リクエスト通り「ルアー」は出さない
-  "メバル": ["ウキ","胴突き"],
-  "シーバス": ["ルアー"],
-  "イシモチ": ["ちょい投げ","胴突き"],
-  "コノシロ": ["サビキ"],
-  "ハゼ": ["ミャク釣り","ウキ","ちょい投げ"],
-  "クロダイ": ["ヘチ・落とし込み","ぶっこみ"],
-  "テナガエビ": ["ミャク釣り","小ウキ"],
-  "ヘラブナ": ["ウキ（エサ釣り）"],
-  "マゴチ": ["ルアー"],
-  "セイゴ": ["ルアー","ウキ"]
+  "アジ":      ["サビキ","ロケットサビキ","ちょい投げ","ウキ"],     // 穴釣り/エレベーターは非表示
+  "カサゴ":    ["穴釣り","胴突き","ブラクリ","ウキ"],               // ルアーは非推奨なので外す
+  "メバル":    ["ウキ","胴突き","ルアー(軽量)"],
+  "シーバス":  ["ルアー","ウキ"],                                   // 主軸はルアー
+  "イシモチ":  ["ちょい投げ","胴突き"],
+  "コノシロ":  ["サビキ","ロケットサビキ"],
+  "ハゼ":      ["ミャク釣り","ウキ","ちょい投げ"],
+  "クロダイ":  ["ヘチ・落とし込み","ぶっこみ","フカセ"],
+  "テナガエビ":["ミャク釣り","小ウキ"],
+  "ヘラブナ":  ["ウキ（エサ釣り）"],
+  "マゴチ":    ["ルアー","エレベーター"],                          // エレベーター想定
+  "セイゴ":    ["ルアー","ウキ"]
 };
 
-/* ====== 魚種→イメージ画像（任意） ======
-   img/ にアップすれば表示（ない場合は自動で非表示） */
+/* ===== 魚画像（仮） ===== */
 const FISH_IMAGES = {
-  "アジ":"img/fish-aji.png",
-  "カサゴ":"img/fish-kasago.png",
-  "メバル":"img/fish-mebaru.png",
-  "シーバス":"img/fish-seabass.png",
-  "ハゼ":"img/fish-haze.png",
-  "クロダイ":"img/fish-kurodai.png",
-  "テナガエビ":"img/fish-tenaga.png",
-  "ヘラブナ":"img/fish-hera.png",
-  "マゴチ":"img/fish-magochi.png",
-  "イシモチ":"img/fish-ishimochi.png",
-  "コノシロ":"img/fish-konoshiro.png",
-  "セイゴ":"img/fish-seigo.png"
+  "アジ":"https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1200&auto=format&fit=crop",
+  "カサゴ":"https://images.unsplash.com/photo-1558981359-219d6364c9cc?q=80&w=1200&auto=format&fit=crop",
+  "メバル":"https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=1200&auto=format&fit=crop",
+  "シーバス":"https://images.unsplash.com/photo-1526481280698-8fcc13fd3b5d?q=80&w=1200&auto=format&fit=crop",
+  "ハゼ":"https://images.unsplash.com/photo-1544551763-7ef25f88c5f5?q=80&w=1200&auto=format&fit=crop",
+  "クロダイ":"https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1200&auto=format&fit=crop",
+  "テナガエビ":"https://images.unsplash.com/photo-1504707748692-419802cf939d?q=80&w=1200&auto=format&fit=crop",
+  "ヘラブナ":"https://images.unsplash.com/photo-1464925257126-6450e871c667?q=80&w=1200&auto=format&fit=crop",
+  "マゴチ":"https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?q=80&w=1200&auto=format&fit=crop",
+  "イシモチ":"https://images.unsplash.com/photo-1498654200943-1088dd4438ae?q=80&w=1200&auto=format&fit=crop",
+  "コノシロ":"https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=1200&auto=format&fit=crop",
+  "セイゴ":"https://images.unsplash.com/photo-1531959870249-9d3f62f96f22?q=80&w=1200&auto=format&fit=crop"
 };
+/* 任意：img/fish-xxx.png を置けば自動でそちらを優先表示 */
+function fishImg(f){ const local=`img/fish-${toSlug(f)}.png`; return localExistsHint(local) || FISH_IMAGES[f] || null; }
 
-/* ====== 魚種→推しリンク（Amazon/Rakuten） ====== */
+/* ===== 仕掛けイラスト（仮） =====
+   1) img/rig-<fish>-<method>.png があればそれを
+   2) なければ method の汎用
+   3) それも無ければダミー画像 */
+const RIG_DEFAULT_BY_METHOD = {
+  "サビキ":"https://placehold.co/1200x600?text=Sabiki+Rig+Guide",
+  "ロケットサビキ":"https://placehold.co/1200x600?text=Rocket+Sabiki+Rig",
+  "ちょい投げ":"https://placehold.co/1200x600?text=Light+Surf+Rig",
+  "胴突き":"https://placehold.co/1200x600?text=Dropper+Loop+Rig",
+  "ブラクリ":"https://placehold.co/1200x600?text=Burakuri+Rig",
+  "ウキ":"https://placehold.co/1200x600?text=Float+Rig",
+  "ミャク釣り":"https://placehold.co/1200x600?text=Keiryu/Miyakuzuri",
+  "ヘチ・落とし込み":"https://placehold.co/1200x600?text=Heci+Otoshikomi",
+  "ルアー":"https://placehold.co/1200x600?text=Lure+Setup",
+  "ルアー(軽量)":"https://placehold.co/1200x600?text=Light+Game+Setup",
+  "ぶっこみ":"https://placehold.co/1200x600?text=Bottom+Rig",
+  "フカセ":"https://placehold.co/1200x600?text=Float+Drift+(Fukase)",
+  "エレベーター":"https://placehold.co/1200x600?text=Elevator+Rig",
+  "小ウキ":"https://placehold.co/1200x600?text=Small+Float+Rig",
+  "ウキ（エサ釣り）":"https://placehold.co/1200x600?text=Float+Bait"
+};
+function rigImg(fish,method){
+  const m = method || "";
+  const localSpecific = `img/rig-${toSlug(fish)}-${toSlug(m)}.png`;
+  const localGeneric  = `img/rig-${toSlug(m)}.png`;
+  return localExistsHint(localSpecific) || localExistsHint(localGeneric) || RIG_DEFAULT_BY_METHOD[m] || "https://placehold.co/1200x600?text=Rig+Illustration";
+}
+/* 補助：実ファイルの存在判定は出来ないので、常にパスを返し onerror で非表示処理 */
+function localExistsHint(path){ return path; }
+
+/* ===== 魚種→ギア（Amazon/Rakuten） ===== */
 const LINKS_BY_FISH = {
   "アジ":[
     {label:"トリックサビキ #6〜8", a:"https://www.amazon.co.jp/s?k=%E3%83%88%E3%83%AA%E3%83%83%E3%82%AF+%E3%82%B5%E3%83%93%E3%82%AD&tag=YOURID-22",
-                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%88%E3%83%AA%E3%83%83%E3%82%AF+%E3%82%B5%E3%83%93%E3%82%AD/?scid=af_pc_etc&sc2id=af_113_0_10001868&icm_agid=&icm_cid=YOUR_RAKUTEN_ID"},
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%88%E3%83%AA%E3%83%83%E3%82%AF+%E3%82%B5%E3%83%93%E3%82%AD/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
     {label:"アミコマセ（パック）",   a:"https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%9F+%E3%82%B3%E3%83%9E%E3%82%BB&tag=YOURID-22",
                                      r:"https://search.rakuten.co.jp/search/mall/%E3%82%A2%E3%83%9F+%E3%82%B3%E3%83%9E%E3%82%BB/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
   ],
@@ -167,7 +196,45 @@ const LINKS_BY_FISH = {
   ]
 };
 
-/* ====== 釣り場DB（ポイント種別ごとに魚種を分ける） ====== */
+/* ===== 釣り方→餌/撒き餌おすすめ ===== */
+const BAIT_BY_METHOD = {
+  "サビキ":[
+    {label:"アミ姫（常温）", a:"https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%9F%E5%A7%AB&tag=YOURID-22",
+                               r:"https://search.rakuten.co.jp/search/mall/%E3%82%A2%E3%83%9F%E5%A7%AB/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"コマセスプーン", a:"https://www.amazon.co.jp/s?k=%E3%82%B3%E3%83%9E%E3%82%BB+%E3%82%B9%E3%83%97%E3%83%BC%E3%83%B3&tag=YOURID-22",
+                               r:"https://search.rakuten.co.jp/search/mall/%E3%82%B3%E3%83%9E%E3%82%BB+%E3%82%B9%E3%83%97%E3%83%BC%E3%83%B3/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ロケットサビキ":[
+    {label:"ロケットカゴ天秤", a:"https://www.amazon.co.jp/s?k=%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88+%E3%82%AB%E3%82%B4&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88+%E3%82%AB%E3%82%B4/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "フカセ":[
+    {label:"オキアミ生/ボイル", a:"https://www.amazon.co.jp/s?k=%E3%82%AA%E3%82%AD%E3%82%A2%E3%83%9F&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%82%AA%E3%82%AD%E3%82%A2%E3%83%9F/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"配合エサ（グレ用等）", a:"https://www.amazon.co.jp/s?k=%E3%83%95%E3%82%AB%E3%82%BB+%E9%85%8D%E5%90%88&tag=YOURID-22",
+                                   r:"https://search.rakuten.co.jp/search/mall/%E3%83%95%E3%82%AB%E3%82%BB+%E9%85%8D%E5%90%88/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "エレベーター":[
+    {label:"活餌（アジ等）活かしバケツ", a:"https://www.amazon.co.jp/s?k=%E6%B4%BB%E3%81%8B%E3%81%97%E3%83%90%E3%82%B1%E3%83%84&tag=YOURID-22",
+                                           r:"https://search.rakuten.co.jp/search/mall/%E6%B4%BB%E3%81%8B%E3%81%97%E3%83%90%E3%82%B1%E3%83%84/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"エレベーター仕掛け", a:"https://www.amazon.co.jp/s?k=%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC+%E4%BB%95%E6%8E%9B%E3%81%91&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "胴突き":[
+    {label:"青イソメ", a:"https://www.amazon.co.jp/s?k=%E9%9D%92%E3%82%A4%E3%82%BD%E3%83%A1&tag=YOURID-22",
+                       r:"https://search.rakuten.co.jp/search/mall/%E9%9D%92%E3%82%A4%E3%82%BD%E3%83%A1/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ぶっこみ":[
+    {label:"夜光鈴/ベル", a:"https://www.amazon.co.jp/s?k=%E5%A4%9C%E5%85%89%E9%88%B4+%E9%87%A3%E3%82%8A&tag=YOURID-22",
+                         r:"https://search.rakuten.co.jp/search/mall/%E5%A4%9C%E5%85%89%E9%88%B4+%E9%87%A3%E3%82%8A/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ミャク釣り":[
+    {label:"ガン玉各種", a:"https://www.amazon.co.jp/s?k=%E3%82%AC%E3%83%B3%E7%8E%89&tag=YOURID-22",
+                         r:"https://search.rakuten.co.jp/search/mall/%E3%82%AC%E3%83%B3%E7%8E%89/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ]
+};
+
+/* ===== 釣り場DB（省略：東京都ぶん） ===== */
 const DB = [
   {
     id:"wakasu",
@@ -179,7 +246,7 @@ const DB = [
       {type:"堤防", fishes:["アジ","イシモチ","コノシロ","メバル","シーバス"]},
       {type:"テトラ/人工磯", fishes:["カサゴ","メバル","シーバス"]}
     ],
-    methods:["サビキ","ちょい投げ","ルアー","穴釣り","胴突き","ブラクリ","ウキ"],
+    methods:["サビキ","ロケットサビキ","ちょい投げ","ルアー","穴釣り","胴突き","ブラクリ","ウキ","フカセ","エレベーター","ぶっこみ"],
     shelf:"堤防角の明暗／人工磯の石間（穴打ち）／表層〜中層回遊",
     times:"朝夕マズメとナイト有利",
     rules:"安全柵あり・混雑多め。ライフジャケット推奨。"
@@ -191,7 +258,7 @@ const DB = [
     address:"江東区豊洲6丁目ほか",
     map:"https://maps.google.com/?q=%E8%B1%8A%E6%B4%B2%E3%81%90%E3%82%8B%E3%82%8A%E5%85%AC%E5%9C%92",
     zones:[ {type:"護岸", fishes:["ハゼ","シーバス","メバル","カサゴ","クロダイ","サヨリ"]} ],
-    methods:["ミャク釣り","ヘチ・落とし込み","ルアー","ウキ","ちょい投げ"],
+    methods:["ミャク釣り","ヘチ・落とし込み","ルアー","ウキ","ちょい投げ","ぶっこみ","フカセ"],
     shelf:"柵際のキワ／橋・常夜灯の明暗／足元のカケ上がり",
     times:"ハゼは日中、シーバスは夜の明暗",
     rules:"撒き餌/トリックサビキ/ロケット天秤禁止。歩行者最優先。"
@@ -203,7 +270,7 @@ const DB = [
     address:"東砂7〜8丁目",
     map:"https://maps.google.com/?q=%E7%A0%82%E7%94%BA%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
     zones:[ {type:"護岸（ゴロタ）", fishes:["ハゼ","シーバス","クロダイ","ボラ"]} ],
-    methods:["ちょい投げ","ウキ","ルアー","ヘチ・落とし込み"],
+    methods:["ちょい投げ","ウキ","ルアー","ヘチ・落とし込み","ぶっこみ","フカセ"],
     shelf:"ゴロタのキワ〜数m先／橋脚のヨレ／下げ始め",
     times:"下げ始め◎／朝夕○",
     rules:"足元根掛かり注意。トイレ点在。"
@@ -215,7 +282,7 @@ const DB = [
     address:"駅直下〜中川大橋沿い",
     map:"https://maps.google.com/?q=%E6%97%A7%E4%B8%AD%E5%B7%9D%20%E6%9D%B1%E5%A4%A7%E5%B3%B6",
     zones:[ {type:"河川（ゴロタ護岸/橋脚）", fishes:["ハゼ","セイゴ"]} ],
-    methods:["ミャク釣り","ウキ","ルアー","ちょい投げ"],
+    methods:["ミャク釣り","ウキ","ルアー","ちょい投げ","ぶっこみ"],
     shelf:"橋の陰・ゴロタ石間／駅直下〜大橋が安定",
     times:"盛夏〜初秋はデイ強い",
     rules:"駐車は大島小松川公園が便利。"
@@ -227,7 +294,7 @@ const DB = [
     address:"清砂大橋〜新砂水辺公園沿い",
     map:"https://maps.google.com/?q=%E6%B8%85%E7%A0%82%E5%A4%A7%E6%A9%8B%20%E6%96%B0%E7%A0%82%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
     zones:[ {type:"河口（ゴロタ）", fishes:["シーバス","クロダイ","ハゼ"]} ],
-    methods:["ルアー","ぶっこみ","ヘチ・落とし込み","ウキ"],
+    methods:["ルアー","ぶっこみ","ヘチ・落とし込み","ウキ","フカセ"],
     shelf:"ゴロタの際／ヨレ／潮の動き出し",
     times:"潮が動くタイミング／朝夕◎",
     rules:"足元滑り注意。最寄りトイレは新砂水辺公園。"
@@ -239,7 +306,7 @@ const DB = [
     address:"江戸川区平井 荒川グラウンド内",
     map:"https://maps.google.com/?q=%E5%B9%B3%E4%BA%95%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92%20%E8%8D%92%E5%B7%9D",
     zones:[ {type:"河川護岸/橋脚", fishes:["シーバス","ハゼ","コイ","ウナギ"]} ],
-    methods:["ルアー","ぶっこみ","ウキ","ミャク釣り"],
+    methods:["ルアー","ぶっこみ","ウキ","ミャク釣り","ちょい投げ"],
     shelf:"橋脚明暗／排水機場の反転流／駆け上がり",
     times:"夜明け前後・夕まずめ",
     rules:"河川敷駐車場は土日祝のみ開放。"
@@ -251,7 +318,7 @@ const DB = [
     address:"大師橋周辺〜羽田空港寄り河口",
     map:"https://maps.google.com/?q=%E5%A4%9A%E6%91%A9%E5%B7%9D%20%E5%A4%A7%E5%B8%AB%E6%A9%8B",
     zones:[ {type:"河口/護岸", fishes:["ハゼ","セイゴ","マゴチ"]} ],
-    methods:["ちょい投げ","ルアー","ウキ"],
+    methods:["ちょい投げ","ルアー","ウキ","エレベーター","ぶっこみ"],
     shelf:"橋脚ヨレ／潮位変化で動くカケ上がり",
     times:"下げの動き出し／朝夕",
     rules:"濁り後に好調な日あり。"
@@ -263,7 +330,7 @@ const DB = [
     address:"品川区八潮4-2-1 周辺",
     map:"https://maps.google.com/?q=%E5%A4%A7%E4%BA%95%E3%81%B5%E9%A0%AD%E4%B8%AD%E5%A4%AE%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92%20%E3%81%AA%E3%81%8E%E3%81%95%E3%81%AE%E6%A3%AE",
     zones:[ {type:"磯状護岸", fishes:["ハゼ","セイゴ"]} ],
-    methods:["ミャク釣り","ウキ","ルアー"],
+    methods:["ミャク釣り","ウキ","ルアー","ちょい投げ"],
     shelf:"ゴロタの穴・岩陰の超近距離",
     times:"デイでOK（ファミリー◎）",
     rules:"立入・釣り禁止区画あり／危険な投げ釣り禁止。"
@@ -275,7 +342,7 @@ const DB = [
     address:"大島・北砂周辺",
     map:"https://maps.google.com/?q=%E6%A8%AA%E5%8D%81%E9%96%93%E5%B7%9D%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92",
     zones:[ {type:"運河", fishes:["ハゼ","テナガエビ"]} ],
-    methods:["ミャク釣り","小ウキ"],
+    methods:["ミャク釣り","小ウキ","ウキ"],
     shelf:"足元際・橋周りの陰",
     times:"夏〜初秋のデイ/夕方◎",
     rules:"ファミリー向け。"
@@ -297,7 +364,7 @@ const DB = [
 /* 都道府県一覧 */
 const PREFS = [...new Set(DB.map(p=>p.pref))];
 
-/* ===== 状態 & ステップ ===== */
+/* ===== 状態 ===== */
 const state = { step:0, pref:null, placeId:null, zoneIdx:null, fish:null, method:null };
 const stepsTitle = ["都道府県","釣り場","ポイント種別","魚種","釣り方","結果"];
 
@@ -307,7 +374,408 @@ function setSteps(){
   document.getElementById('back').hidden = state.step===0;
 }
 
-/* ===== 画面描画 ===== */
+/* ===== 描画 ===== */
+function render(){
+  setSteps();
+  const app = document.getElementById('app');
+
+  // 0: 都道府県
+  if(state.step===0){
+    app.innerHTML = `<div class="hero"><strong>都道府県</strong> を選ぶと、その地域の釣り場が出ます。</div>
+    <div class="grid">
+      ${PREFS.map(p=>{
+        const n = DB.filter(d=>d.pref===p).length;
+        return `<div class="card">
+          <h3>${p}</h3>
+          <p class="muted">${n} スポット</p>
+          <div class="row"><button class="pri" onclick="selPref('${p}')">この都道府県を選ぶ</button></div>
+        </div>`}).join('')}
+    </div>`;
+    return;
+  }
+
+  // 1: 釣り場
+  if(state.step===1){
+    const list = DB.filter(d=>d.pref===state.pref);
+    app.innerHTML = `<div class="grid">
+      ${list.map(d=>`
+        <div class="c<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RigNavi MVP</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+  :root{
+    /* 明るめ＆今っぽい海配色 */
+    --bg1:#eff9ff; --bg2:#e9f5ff;
+    --ink:#0b2531; --muted:#5a7b8c;
+    --glass:#ffffffc9; --line:#d8e9f3;
+    --card:#ffffff; --chip:#f4faff;
+    --accent:#12b6ff; --accent-ink:#013449;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  }
+  header{
+    position:sticky; top:0; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; backdrop-filter:saturate(140%) blur(10px);
+    background:var(--glass); border-bottom:1px solid var(--line);
+  }
+  .brand{font-weight:800; letter-spacing:.1px; display:flex; gap:8px; align-items:center}
+  .brand i{font-style:normal; font-size:18px}
+  .badge{background:#d6f4ff; color:#067; padding:6px 10px; border-radius:999px; font-size:12px}
+  main{max-width:980px; margin:0 auto; padding:16px}
+  #hello{margin:4px 0 16px; color:var(--muted)}
+  .steps{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+  .step{border:1px solid var(--line); background:var(--chip); color:var(--muted);
+        border-radius:12px; padding:8px 12px; font-size:13px}
+  .step.on{border-color:#bfe9ff; color:#0a4c63; background:#e8f8ff; font-weight:700}
+  #back{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
+        padding:10px 14px; border-radius:10px}
+  #back[hidden]{display:none}
+
+  .grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:16px; box-shadow:0 10px 22px rgba(23,70,96,.08);
+  }
+  h1,h2,h3{margin:.2em 0 .5em}
+  h1{font-size:26px} h3{font-size:18px}
+  .muted{color:var(--muted)}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+  .chip,button{appearance:none; border:none; cursor:pointer; border-radius:12px; padding:12px 14px; font-size:15px}
+  .chip{background:var(--chip)}
+  button.pri{background:var(--accent); color:var(--accent-ink); font-weight:800}
+  button.ghost{background:#fff; border:1px solid var(--line)}
+  a{color:#007fb3}
+  ul.items{padding-left:18px; margin:8px 0}
+  ul.items li{margin:10px 0}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin:.6rem 0}
+  .kv span{background:#f6fbff; border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px}
+  .hero{background:linear-gradient(135deg,#e8f7ff,#ffffff); border:1px dashed var(--line); border-radius:16px; padding:12px; margin-bottom:12px}
+  .banner{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+  .shops{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px}
+  .shop{padding:8px 10px; border-radius:10px; background:#fff; border:1px solid var(--line); font-size:14px}
+  .cap{font-size:13px; color:var(--muted); margin:4px 0 8px}
+  .sectionTitle{margin-top:12px; margin-bottom:6px; font-weight:800}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><i>🎣</i>RigNavi</div>
+  <div class="badge">MVP</div>
+</header>
+
+<main>
+  <div id="hello">起動中…</div>
+
+  <div class="row" style="justify-content:space-between">
+    <div class="steps" id="steps"></div>
+    <button id="back" class="ghost" hidden onclick="goBack()">戻る</button>
+  </div>
+
+  <div id="app"></div>
+</main>
+
+<script>
+/* ===== 基本設定 ===== */
+const LIFF_ID = "2008257307-RwPLYWG1";
+const VERSION = "9";
+
+/* ===== 魚種→許可釣法（自動フィルタ） ===== */
+const FISH_METHODS = {
+  "アジ":      ["サビキ","ロケットサビキ","ちょい投げ","ウキ"],     // 穴釣り/エレベーターは非表示
+  "カサゴ":    ["穴釣り","胴突き","ブラクリ","ウキ"],               // ルアーは非推奨なので外す
+  "メバル":    ["ウキ","胴突き","ルアー(軽量)"],
+  "シーバス":  ["ルアー","ウキ"],                                   // 主軸はルアー
+  "イシモチ":  ["ちょい投げ","胴突き"],
+  "コノシロ":  ["サビキ","ロケットサビキ"],
+  "ハゼ":      ["ミャク釣り","ウキ","ちょい投げ"],
+  "クロダイ":  ["ヘチ・落とし込み","ぶっこみ","フカセ"],
+  "テナガエビ":["ミャク釣り","小ウキ"],
+  "ヘラブナ":  ["ウキ（エサ釣り）"],
+  "マゴチ":    ["ルアー","エレベーター"],                          // エレベーター想定
+  "セイゴ":    ["ルアー","ウキ"]
+};
+
+/* ===== 魚画像（仮） ===== */
+const FISH_IMAGES = {
+  "アジ":"https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1200&auto=format&fit=crop",
+  "カサゴ":"https://images.unsplash.com/photo-1558981359-219d6364c9cc?q=80&w=1200&auto=format&fit=crop",
+  "メバル":"https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=1200&auto=format&fit=crop",
+  "シーバス":"https://images.unsplash.com/photo-1526481280698-8fcc13fd3b5d?q=80&w=1200&auto=format&fit=crop",
+  "ハゼ":"https://images.unsplash.com/photo-1544551763-7ef25f88c5f5?q=80&w=1200&auto=format&fit=crop",
+  "クロダイ":"https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1200&auto=format&fit=crop",
+  "テナガエビ":"https://images.unsplash.com/photo-1504707748692-419802cf939d?q=80&w=1200&auto=format&fit=crop",
+  "ヘラブナ":"https://images.unsplash.com/photo-1464925257126-6450e871c667?q=80&w=1200&auto=format&fit=crop",
+  "マゴチ":"https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?q=80&w=1200&auto=format&fit=crop",
+  "イシモチ":"https://images.unsplash.com/photo-1498654200943-1088dd4438ae?q=80&w=1200&auto=format&fit=crop",
+  "コノシロ":"https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=1200&auto=format&fit=crop",
+  "セイゴ":"https://images.unsplash.com/photo-1531959870249-9d3f62f96f22?q=80&w=1200&auto=format&fit=crop"
+};
+/* 任意：img/fish-xxx.png を置けば自動でそちらを優先表示 */
+function fishImg(f){ const local=`img/fish-${toSlug(f)}.png`; return localExistsHint(local) || FISH_IMAGES[f] || null; }
+
+/* ===== 仕掛けイラスト（仮） =====
+   1) img/rig-<fish>-<method>.png があればそれを
+   2) なければ method の汎用
+   3) それも無ければダミー画像 */
+const RIG_DEFAULT_BY_METHOD = {
+  "サビキ":"https://placehold.co/1200x600?text=Sabiki+Rig+Guide",
+  "ロケットサビキ":"https://placehold.co/1200x600?text=Rocket+Sabiki+Rig",
+  "ちょい投げ":"https://placehold.co/1200x600?text=Light+Surf+Rig",
+  "胴突き":"https://placehold.co/1200x600?text=Dropper+Loop+Rig",
+  "ブラクリ":"https://placehold.co/1200x600?text=Burakuri+Rig",
+  "ウキ":"https://placehold.co/1200x600?text=Float+Rig",
+  "ミャク釣り":"https://placehold.co/1200x600?text=Keiryu/Miyakuzuri",
+  "ヘチ・落とし込み":"https://placehold.co/1200x600?text=Heci+Otoshikomi",
+  "ルアー":"https://placehold.co/1200x600?text=Lure+Setup",
+  "ルアー(軽量)":"https://placehold.co/1200x600?text=Light+Game+Setup",
+  "ぶっこみ":"https://placehold.co/1200x600?text=Bottom+Rig",
+  "フカセ":"https://placehold.co/1200x600?text=Float+Drift+(Fukase)",
+  "エレベーター":"https://placehold.co/1200x600?text=Elevator+Rig",
+  "小ウキ":"https://placehold.co/1200x600?text=Small+Float+Rig",
+  "ウキ（エサ釣り）":"https://placehold.co/1200x600?text=Float+Bait"
+};
+function rigImg(fish,method){
+  const m = method || "";
+  const localSpecific = `img/rig-${toSlug(fish)}-${toSlug(m)}.png`;
+  const localGeneric  = `img/rig-${toSlug(m)}.png`;
+  return localExistsHint(localSpecific) || localExistsHint(localGeneric) || RIG_DEFAULT_BY_METHOD[m] || "https://placehold.co/1200x600?text=Rig+Illustration";
+}
+/* 補助：実ファイルの存在判定は出来ないので、常にパスを返し onerror で非表示処理 */
+function localExistsHint(path){ return path; }
+
+/* ===== 魚種→ギア（Amazon/Rakuten） ===== */
+const LINKS_BY_FISH = {
+  "アジ":[
+    {label:"トリックサビキ #6〜8", a:"https://www.amazon.co.jp/s?k=%E3%83%88%E3%83%AA%E3%83%83%E3%82%AF+%E3%82%B5%E3%83%93%E3%82%AD&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%88%E3%83%AA%E3%83%83%E3%82%AF+%E3%82%B5%E3%83%93%E3%82%AD/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"アミコマセ（パック）",   a:"https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%9F+%E3%82%B3%E3%83%9E%E3%82%BB&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%82%A2%E3%83%9F+%E3%82%B3%E3%83%9E%E3%82%BB/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "カサゴ":[
+    {label:"ブラクリ 5〜8号",       a:"https://www.amazon.co.jp/s?k=%E3%83%96%E3%83%A9%E3%82%AF%E3%83%AA&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%96%E3%83%A9%E3%82%AF%E3%83%AA/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"根魚ワーム 2inch",      a:"https://www.amazon.co.jp/s?k=%E6%A0%B9%E9%AD%9A+%E3%83%AF%E3%83%BC%E3%83%A0&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E6%A0%B9%E9%AD%9A+%E3%83%AF%E3%83%BC%E3%83%A0/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "シーバス":[
+    {label:"ミノー 9〜12cm",        a:"https://www.amazon.co.jp/s?k=%E3%82%B7%E3%83%BC%E3%83%90%E3%82%B9+%E3%83%9F%E3%83%8E%E3%83%BC&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%82%B7%E3%83%BC%E3%83%90%E3%82%B9+%E3%83%9F%E3%83%8E%E3%83%BC/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"バイブ 14〜20g",        a:"https://www.amazon.co.jp/s?k=%E3%82%B7%E3%83%BC%E3%83%90%E3%82%B9+%E3%83%90%E3%82%A4%E3%83%96&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%82%B7%E3%83%BC%E3%83%90%E3%82%B9+%E3%83%90%E3%82%A4%E3%83%96/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ハゼ":[
+    {label:"のべ竿2.7m＋小鈎",      a:"https://www.amazon.co.jp/s?k=%E3%81%AE%E3%81%B9%E7%AB%BF+2.7m&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%81%AE%E3%81%B9%E7%AB%BF+2.7m/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"ミャク釣り仕掛け",      a:"https://www.amazon.co.jp/s?k=%E3%83%8F%E3%82%BC+%E3%83%9F%E3%83%A3%E3%82%AF%E9%87%A3%E3%82%8A&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%8F%E3%82%BC+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "クロダイ":[
+    {label:"落とし込み一式",        a:"https://www.amazon.co.jp/s?k=%E8%90%BD%E3%81%A8%E3%81%97%E8%BE%BC%E3%81%BF+%E4%BB%95%E6%8E%9B%E3%81%91&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E8%90%BD%E3%81%A8%E3%81%97%E8%BE%BC%E3%81%BF+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "テナガエビ":[
+    {label:"テナガエビ仕掛け",      a:"https://www.amazon.co.jp/s?k=%E3%83%86%E3%83%8A%E3%82%AC%E3%82%A8%E3%83%93+%E4%BB%95%E6%8E%9B%E3%81%91&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%86%E3%83%8A%E3%82%AC%E3%82%A8%E3%83%93+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ヘラブナ":[
+    {label:"ウキ仕掛け",            a:"https://www.amazon.co.jp/s?k=%E3%83%98%E3%83%A9%E3%83%96%E3%83%8A+%E4%BB%95%E6%8E%9B%E3%81%91&tag=YOURID-22",
+                                     r:"https://search.rakuten.co.jp/search/mall/%E3%83%98%E3%83%A9%E3%83%96%E3%83%8A+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "マゴチ":[
+    {label:"ジグヘッド20〜30g＋ワーム", a:"https://www.amazon.co.jp/s?k=%E3%83%9E%E3%82%B4%E3%83%81+%E3%83%AF%E3%83%BC%E3%83%A0&tag=YOURID-22",
+                                         r:"https://search.rakuten.co.jp/search/mall/%E3%83%9E%E3%82%B4%E3%83%81+%E3%83%AF%E3%83%BC%E3%83%A0/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ]
+};
+
+/* ===== 釣り方→餌/撒き餌おすすめ ===== */
+const BAIT_BY_METHOD = {
+  "サビキ":[
+    {label:"アミ姫（常温）", a:"https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%9F%E5%A7%AB&tag=YOURID-22",
+                               r:"https://search.rakuten.co.jp/search/mall/%E3%82%A2%E3%83%9F%E5%A7%AB/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"コマセスプーン", a:"https://www.amazon.co.jp/s?k=%E3%82%B3%E3%83%9E%E3%82%BB+%E3%82%B9%E3%83%97%E3%83%BC%E3%83%B3&tag=YOURID-22",
+                               r:"https://search.rakuten.co.jp/search/mall/%E3%82%B3%E3%83%9E%E3%82%BB+%E3%82%B9%E3%83%97%E3%83%BC%E3%83%B3/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ロケットサビキ":[
+    {label:"ロケットカゴ天秤", a:"https://www.amazon.co.jp/s?k=%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88+%E3%82%AB%E3%82%B4&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88+%E3%82%AB%E3%82%B4/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "フカセ":[
+    {label:"オキアミ生/ボイル", a:"https://www.amazon.co.jp/s?k=%E3%82%AA%E3%82%AD%E3%82%A2%E3%83%9F&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%82%AA%E3%82%AD%E3%82%A2%E3%83%9F/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"配合エサ（グレ用等）", a:"https://www.amazon.co.jp/s?k=%E3%83%95%E3%82%AB%E3%82%BB+%E9%85%8D%E5%90%88&tag=YOURID-22",
+                                   r:"https://search.rakuten.co.jp/search/mall/%E3%83%95%E3%82%AB%E3%82%BB+%E9%85%8D%E5%90%88/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "エレベーター":[
+    {label:"活餌（アジ等）活かしバケツ", a:"https://www.amazon.co.jp/s?k=%E6%B4%BB%E3%81%8B%E3%81%97%E3%83%90%E3%82%B1%E3%83%84&tag=YOURID-22",
+                                           r:"https://search.rakuten.co.jp/search/mall/%E6%B4%BB%E3%81%8B%E3%81%97%E3%83%90%E3%82%B1%E3%83%84/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"},
+    {label:"エレベーター仕掛け", a:"https://www.amazon.co.jp/s?k=%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC+%E4%BB%95%E6%8E%9B%E3%81%91&tag=YOURID-22",
+                                 r:"https://search.rakuten.co.jp/search/mall/%E3%82%A8%E3%83%AC%E3%83%99%E3%83%BC%E3%82%BF%E3%83%BC+%E4%BB%95%E6%8E%9B%E3%81%91/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "胴突き":[
+    {label:"青イソメ", a:"https://www.amazon.co.jp/s?k=%E9%9D%92%E3%82%A4%E3%82%BD%E3%83%A1&tag=YOURID-22",
+                       r:"https://search.rakuten.co.jp/search/mall/%E9%9D%92%E3%82%A4%E3%82%BD%E3%83%A1/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ぶっこみ":[
+    {label:"夜光鈴/ベル", a:"https://www.amazon.co.jp/s?k=%E5%A4%9C%E5%85%89%E9%88%B4+%E9%87%A3%E3%82%8A&tag=YOURID-22",
+                         r:"https://search.rakuten.co.jp/search/mall/%E5%A4%9C%E5%85%89%E9%88%B4+%E9%87%A3%E3%82%8A/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ],
+  "ミャク釣り":[
+    {label:"ガン玉各種", a:"https://www.amazon.co.jp/s?k=%E3%82%AC%E3%83%B3%E7%8E%89&tag=YOURID-22",
+                         r:"https://search.rakuten.co.jp/search/mall/%E3%82%AC%E3%83%B3%E7%8E%89/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID"}
+  ]
+};
+
+/* ===== 釣り場DB（省略：東京都ぶん） ===== */
+const DB = [
+  {
+    id:"wakasu",
+    pref:"東京都", city:"江東区",
+    name:"若洲海浜公園（海釣り施設・人工磯）",
+    address:"東京都江東区若洲3丁目",
+    map:"https://maps.google.com/?q=%E8%8B%A5%E6%B4%B2%E6%B5%B7%E6%BF%B1%E5%85%AC%E5%9C%92%20%E6%B5%B7%E9%87%A3%E3%82%8A%E6%96%BD%E8%A8%AD",
+    zones:[
+      {type:"堤防", fishes:["アジ","イシモチ","コノシロ","メバル","シーバス"]},
+      {type:"テトラ/人工磯", fishes:["カサゴ","メバル","シーバス"]}
+    ],
+    methods:["サビキ","ロケットサビキ","ちょい投げ","ルアー","穴釣り","胴突き","ブラクリ","ウキ","フカセ","エレベーター","ぶっこみ"],
+    shelf:"堤防角の明暗／人工磯の石間（穴打ち）／表層〜中層回遊",
+    times:"朝夕マズメとナイト有利",
+    rules:"安全柵あり・混雑多め。ライフジャケット推奨。"
+  },
+  {
+    id:"toyosu-gururi",
+    pref:"東京都", city:"江東区",
+    name:"豊洲ぐるり公園（護岸）",
+    address:"江東区豊洲6丁目ほか",
+    map:"https://maps.google.com/?q=%E8%B1%8A%E6%B4%B2%E3%81%90%E3%82%8B%E3%82%8A%E5%85%AC%E5%9C%92",
+    zones:[ {type:"護岸", fishes:["ハゼ","シーバス","メバル","カサゴ","クロダイ","サヨリ"]} ],
+    methods:["ミャク釣り","ヘチ・落とし込み","ルアー","ウキ","ちょい投げ","ぶっこみ","フカセ"],
+    shelf:"柵際のキワ／橋・常夜灯の明暗／足元のカケ上がり",
+    times:"ハゼは日中、シーバスは夜の明暗",
+    rules:"撒き餌/トリックサビキ/ロケット天秤禁止。歩行者最優先。"
+  },
+  {
+    id:"sunamachi-mizube",
+    pref:"東京都", city:"江東区",
+    name:"砂町水辺公園（荒川・江東区側）",
+    address:"東砂7〜8丁目",
+    map:"https://maps.google.com/?q=%E7%A0%82%E7%94%BA%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
+    zones:[ {type:"護岸（ゴロタ）", fishes:["ハゼ","シーバス","クロダイ","ボラ"]} ],
+    methods:["ちょい投げ","ウキ","ルアー","ヘチ・落とし込み","ぶっこみ","フカセ"],
+    shelf:"ゴロタのキワ〜数m先／橋脚のヨレ／下げ始め",
+    times:"下げ始め◎／朝夕○",
+    rules:"足元根掛かり注意。トイレ点在。"
+  },
+  {
+    id:"kyunakagawa",
+    pref:"東京都", city:"江東区/江戸川区",
+    name:"旧中川（東大島駅〜中川大橋）",
+    address:"駅直下〜中川大橋沿い",
+    map:"https://maps.google.com/?q=%E6%97%A7%E4%B8%AD%E5%B7%9D%20%E6%9D%B1%E5%A4%A7%E5%B3%B6",
+    zones:[ {type:"河川（ゴロタ護岸/橋脚）", fishes:["ハゼ","セイゴ"]} ],
+    methods:["ミャク釣り","ウキ","ルアー","ちょい投げ","ぶっこみ"],
+    shelf:"橋の陰・ゴロタ石間／駅直下〜大橋が安定",
+    times:"盛夏〜初秋はデイ強い",
+    rules:"駐車は大島小松川公園が便利。"
+  },
+  {
+    id:"arakawa-estuary",
+    pref:"東京都", city:"江東区",
+    name:"荒川河口（清砂大橋〜新砂水辺公園）",
+    address:"清砂大橋〜新砂水辺公園沿い",
+    map:"https://maps.google.com/?q=%E6%B8%85%E7%A0%82%E5%A4%A7%E6%A9%8B%20%E6%96%B0%E7%A0%82%E6%B0%B4%E8%BE%BA%E5%85%AC%E5%9C%92",
+    zones:[ {type:"河口（ゴロタ）", fishes:["シーバス","クロダイ","ハゼ"]} ],
+    methods:["ルアー","ぶっこみ","ヘチ・落とし込み","ウキ","フカセ"],
+    shelf:"ゴロタの際／ヨレ／潮の動き出し",
+    times:"潮が動くタイミング／朝夕◎",
+    rules:"足元滑り注意。最寄りトイレは新砂水辺公園。"
+  },
+  {
+    id:"hirai-undo",
+    pref:"東京都", city:"江戸川区",
+    name:"平井運動公園（荒川×旧中川合流域）",
+    address:"江戸川区平井 荒川グラウンド内",
+    map:"https://maps.google.com/?q=%E5%B9%B3%E4%BA%95%E9%81%8B%E5%8B%95%E5%85%AC%E5%9C%92%20%E8%8D%92%E5%B7%9D",
+    zones:[ {type:"河川護岸/橋脚", fishes:["シーバス","ハゼ","コイ","ウナギ"]} ],
+    methods:["ルアー","ぶっこみ","ウキ","ミャク釣り","ちょい投げ"],
+    shelf:"橋脚明暗／排水機場の反転流／駆け上がり",
+    times:"夜明け前後・夕まずめ",
+    rules:"河川敷駐車場は土日祝のみ開放。"
+  },
+  {
+    id:"tamagawa-daishi",
+    pref:"東京都", city:"大田区",
+    name:"多摩川・大師橋〜羽田（東京都側）",
+    address:"大師橋周辺〜羽田空港寄り河口",
+    map:"https://maps.google.com/?q=%E5%A4%9A%E6%91%A9%E5%B7%9D%20%E5%A4%A7%E5%B8%AB%E6%A9%8B",
+    zones:[ {type:"河口/護岸", fishes:["ハゼ","セイゴ","マゴチ"]} ],
+    methods:["ちょい投げ","ルアー","ウキ","エレベーター","ぶっこみ"],
+    shelf:"橋脚ヨレ／潮位変化で動くカケ上がり",
+    times:"下げの動き出し／朝夕",
+    rules:"濁り後に好調な日あり。"
+  },
+  {
+    id:"ooi-nagisa",
+    pref:"東京都", city:"品川区/大田区",
+    name:"大井ふ頭中央海浜公園（なぎさの森）",
+    address:"品川区八潮4-2-1 周辺",
+    map:"https://maps.google.com/?q=%E5%A4%A7%E4%BA%95%E3%81%B5%E9%A0%AD%E4%B8%AD%E5%A4%AE%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92%20%E3%81%AA%E3%81%8E%E3%81%95%E3%81%AE%E6%A3%AE",
+    zones:[ {type:"磯状護岸", fishes:["ハゼ","セイゴ"]} ],
+    methods:["ミャク釣り","ウキ","ルアー","ちょい投げ"],
+    shelf:"ゴロタの穴・岩陰の超近距離",
+    times:"デイでOK（ファミリー◎）",
+    rules:"立入・釣り禁止区画あり／危険な投げ釣り禁止。"
+  },
+  {
+    id:"yokojikken",
+    pref:"東京都", city:"江東区",
+    name:"横十間川親水公園（運河）",
+    address:"大島・北砂周辺",
+    map:"https://maps.google.com/?q=%E6%A8%AA%E5%8D%81%E9%96%93%E5%B7%9D%E8%A6%AA%E6%B0%B4%E5%85%AC%E5%9C%92",
+    zones:[ {type:"運河", fishes:["ハゼ","テナガエビ"]} ],
+    methods:["ミャク釣り","小ウキ","ウキ"],
+    shelf:"足元際・橋周りの陰",
+    times:"夏〜初秋のデイ/夕方◎",
+    rules:"ファミリー向け。"
+  },
+  {
+    id:"mizumoto",
+    pref:"東京都", city:"葛飾区",
+    name:"水元公園（淡水：池・水路）",
+    address:"葛飾区 水元公園",
+    map:"https://maps.google.com/?q=%E6%B0%B4%E5%85%83%E5%85%AC%E5%9C%92",
+    zones:[ {type:"池・水路", fishes:["コイ","フナ","ヘラブナ","テナガエビ"]} ],
+    methods:["ウキ（エサ釣り）","ミャク釣り"],
+    shelf:"水路・ワンドのカケ上がり／杭まわり",
+    times:"日中でOK（混雑注意）",
+    rules:"無料（一部施設除く）。駐車場・トイレ多数。"
+  }
+];
+
+/* 都道府県一覧 */
+const PREFS = [...new Set(DB.map(p=>p.pref))];
+
+/* ===== 状態 ===== */
+const state = { step:0, pref:null, placeId:null, zoneIdx:null, fish:null, method:null };
+const stepsTitle = ["都道府県","釣り場","ポイント種別","魚種","釣り方","結果"];
+
+function setSteps(){
+  const s = document.getElementById('steps');
+  s.innerHTML = stepsTitle.map((t,i)=>`<div class="step ${i<=state.step?'on':''}">${i+1}. ${t}</div>`).join('');
+  document.getElementById('back').hidden = state.step===0;
+}
+
+/* ===== 描画 ===== */
 function render(){
   setSteps();
   const app = document.getElementById('app');
@@ -370,10 +838,11 @@ function render(){
     return;
   }
 
-  // 4: 釣り方（魚種で自動フィルタ）
+  // 4: 釣り方（魚種で自動フィルタ & その場所で可能なものに限定）
   if(state.step===4){
     const p = getPlace();
-    const allowed = (FISH_METHODS[state.fish]||[]).filter(m => (p.methods||[]).includes(m));
+    const allowedByFish = (FISH_METHODS[state.fish]||[]);
+    const allowed = allowedByFish.filter(m => (p.methods||[]).includes(m));
     app.innerHTML = `
       <div class="card">
         <h3>${p.name}｜${getZone().type}｜${state.fish} の釣り方</h3>
@@ -384,23 +853,30 @@ function render(){
     return;
   }
 
-  // 5: 結果
+  // 5: 結果（ご指定の順で表示）
   if(state.step===5){
     const p = getPlace(), z = getZone();
     const links = LINKS_BY_FISH[state.fish] || [];
-    const img = FISH_IMAGES[state.fish];
+    const baitLinks = BAIT_BY_METHOD[state.method] || [];
+    const fimg = fishImg(state.fish);
+    const rimg = rigImg(state.fish, state.method);
 
     app.innerHTML = `
       <div class="card">
-        ${img ? `<img class="banner" src="${img}" alt="${state.fish} rig" onerror="this.style.display='none'">` : ''}
-        <h3>${p.name}</h3>
+        ${fimg ? `
+          <div class="sectionTitle">指定した魚画像 ↓</div>
+          <img class="banner" src="${fimg}" alt="${state.fish}" onerror="this.style.display='none'">` : ''}
+
+        ${rimg ? `
+          <div class="sectionTitle">仕掛けイラスト ↓</div>
+          <img class="banner" src="${rimg}" alt="${state.method} rig" onerror="this.style.display='none'">` : ''}
+
+        <h3 style="margin-top:10px">${p.name}</h3>
         <div class="kv">
-          <span>${z.type}</span>
-          <span>魚種：${state.fish}</span>
-          <span>釣り方：${state.method}</span>
+          <span>${z.type}</span><span>魚種：${state.fish}</span><span>釣り方：${state.method}</span>
         </div>
 
-        <h4>おすすめ部材</h4>
+        <div class="sectionTitle">オススメ部材 ↓</div>
         ${links.length ? `<ul class="items">
           ${links.map(i=>`<li>${i.label}
               <div class="shops">
@@ -408,18 +884,29 @@ function render(){
                 <a class="shop" href="#" onclick="ext('${i.r}')">楽天</a>
               </div>
             </li>`).join('')}
-        </ul>` : '<p class="muted">この魚種のリンクは準備中</p>'}
+        </ul>` : '<p class="muted">この魚種の部材リンクは準備中</p>'}
 
-        <h4>棚・狙い目</h4>
+        <div class="sectionTitle">餌・撒き餌のオススメ（釣り方別） ↓</div>
+        ${baitLinks.length ? `<ul class="items">
+          ${baitLinks.map(i=>`<li>${i.label}
+              <div class="shops">
+                <a class="shop" href="#" onclick="ext('${i.a}')">Amazon</a>
+                <a class="shop" href="#" onclick="ext('${i.r}')">楽天</a>
+              </div>
+            </li>`).join('')}
+        </ul>` : '<p class="muted">この釣り方の餌・撒き餌リンクは準備中</p>'}
+
+        <div class="sectionTitle">棚、狙い目 ↓</div>
         <p>${p.shelf}</p>
 
-        <h4>おすすめ時間帯</h4>
+        <div class="sectionTitle">オススメ時間帯 ↓</div>
         <p>${p.times||'朝夕が基本。潮の動き出しを重視。'}</p>
 
-        <h4>現地ルール・注意</h4>
+        <div class="sectionTitle">現地ルール（備考） ↓</div>
         <p class="muted">${p.rules||'安全第一でお願いします。'}</p>
 
-        <div class="row" style="margin-top:8px">
+        <div class="sectionTitle">場所と友だち共有</div>
+        <div class="row" style="margin-top:6px">
           <button class="ghost" onclick="openMap('${p.id}')">場所を地図で確認</button>
           <button class="pri" onclick="share()">友だちに共有</button>
         </div>
@@ -429,6 +916,7 @@ function render(){
 }
 
 /* ===== 選択ハンドラ ===== */
+function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\w]+/g,'-'); }
 function getPlace(){ return DB.find(p=>p.id===state.placeId); }
 function getZone(){ const p = getPlace(); return p?.zones?.[state.zoneIdx]; }
 function openWin(url){ return liff.isInClient()? liff.openWindow({url, external:true}) : window.open(url,'_blank'); }
@@ -469,8 +957,7 @@ function goBack(){
 async function share(){
   if(!liff.isInClient()){ alert('共有はLINEアプリ内で開いてください'); return; }
   const p = getPlace(), z = getZone();
-  const url = p.map;
-  const msg = `${p.name}\n${z.type}\n${state.fish} × ${state.method}\n棚: ${p.shelf}\n時間帯: ${p.times||'朝夕'}\n地図: ${url}`;
+  const msg = `${p.name}\n${z.type}\n${state.fish} × ${state.method}\n棚: ${p.shelf}\n時間帯: ${p.times||'朝夕'}\n地図: ${p.map}`;
   await liff.shareTargetPicker([{ type:'text', text: msg }]);
 }
 </script>
