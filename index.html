@@ -140,15 +140,46 @@ const BAIT_BY_METHOD = {
 
 /* ===== 画像（仮） ===== */
 const FISH_IMG_FALLBACK = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop";
-function fishImg(f){ return `img/fish-${toSlug(f)}.png`; }
-function rigImg(fish,method){
-  const m = method||"";
+<script>
+// 括弧内（例:「シーバス（スズキ）」の（スズキ））を落とす
+function _baseName(s){ return (s||'').replace(/[（(].*?[)）]/g,''); }
+
+// 魚の写真パス：上書きマップ → 自動命名
+function fishImg(f){
+  const map = window.FISH_IMG_OVERRIDE || {};
+  const candidates = [
+    f,                // 例: "シーバス（スズキ）"
+    _baseName(f),     // 例: "シーバス"
+    toSlug(f)         // 例: "シーバス-スズキ-"
+  ];
+  for (const k of candidates){
+    if (map[k]) return map[k];
+  }
+  return `img/fish-${toSlug(f)}.png`; // 自動命名
+}
+
+// 仕掛け図パス：上書きマップ → 自動命名
+function rigImg(fish, method){
+  const map = window.RIG_IMG_OVERRIDE || {};
+  const candidates = [
+    `${fish}:${method}`,             // 例: "シーバス（スズキ）:ルアー"
+    `${_baseName(fish)}:${method}`,  // 例: "シーバス:ルアー"
+    `${toSlug(fish)}:${toSlug(method)}`
+  ];
+  for (const k of candidates){
+    if (map[k]) {
+      const url = map[k];
+      return { specific: url, generic: url, placeholder: url };
+    }
+  }
+  const m = toSlug(method)||"";
   return {
-    specific: `img/rig-${toSlug(fish)}-${toSlug(m)}.png`,
-    generic:  `img/rig-${toSlug(m)}.png`,
-    placeholder: "https://placehold.co/1200x600?text=Rig+Illustration"
+    specific:  `img/rig-${toSlug(fish)}-${m}.png`,
+    generic:   `img/rig-${m}.png`,
+    placeholder: "https://placehold.co/1200x600?text=Rig%20Illustration"
   };
 }
+</script>
 
 /* ===== 魚種データ（完全版） ===== */
 const FISH_BOOK = {
