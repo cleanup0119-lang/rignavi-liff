@@ -51,6 +51,9 @@
   .param b{font-weight:800;color:#055}
   .method-chips .chip.on{background:#e8f8ff;border:1px solid #bfe9ff;font-weight:700}
   .memo{font-size:13px;color:#174656;background:#f6fbff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px}
+#housebar .card{border:2px solid #bfe9ff}
+  #housebar .prtag{font-size:12px;color:#0a4c63;background:#e8f8ff;border:1px solid #bfe9ff;border-radius:999px;padding:4px 8px;margin-right:6px}
+  #housebar .banner{max-height:220px;object-fit:cover}
 </style>
 </head>
 <body>
@@ -61,7 +64,9 @@
 
 <main>
   <div id="hello">起動中…</div>
-
+  <!-- ▼ 追加：ハウス広告の固定表示コンテナ -->
+  <div id="housebar"></div>
+  
   <div class="row" style="justify-content:space-between">
     <div class="steps" id="steps"></div>
     <button id="back" class="ghost" hidden onclick="goBack()">戻る</button>
@@ -73,13 +78,32 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "40";
+const VERSION = "41";
 
 /* ===== ユーティリティ ===== */
 function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\wぁ-んァ-ン一-龯ー]+/g,'-'); }
 function q(s){ return encodeURIComponent(s); }
 function linkAmazon(keyword){ return `https://www.amazon.co.jp/s?k=${q(keyword)}&tag=YOURID-22`; }
 function linkRakuten(keyword){ return `https://search.rakuten.co.jp/search/mall/${q(keyword)}/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID`; }
+
+// シーズン記事（必要に応じて増やす）
+const HOUSE_CAMPAIGNS = [
+  { id:"fall-sabiki", title:"秋のサビキ最強セット",
+    text:"これさえあれば堤防OK。編集部セレクト3点を公開中。",
+    url:"https://your.site/rignavi/fall-sabiki?ref=house",
+    img:"https://placehold.co/1200x360?text=Sabiki+Special",
+    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] },
+  { id:"rockfish-pack", title:"根魚スターター（夜間）",
+    text:"胴突き×ブラクリ×常夜灯の攻め方を1ページで解説。",
+    url:"https://your.site/rignavi/rockfish?ref=house",
+    img:"https://placehold.co/1200x360?text=Rockfish+Pack",
+    targetFish:["カサゴ","メバル","アイナメ"] }
+];
+// 魚に紐づく記事があればそちら、なければ先頭
+function pickHouseCampaign(fish){
+  const f = FISH_ALIAS?.[fish] || fish;
+  return HOUSE_CAMPAIGNS.find(c => (c.targetFish||[]).includes(f)) || HOUSE_CAMPAIGNS[0] || null;
+}
 
 /* ===== 釣法→代表ギア語彙 ===== */
 const METHOD_GEAR = {
@@ -282,7 +306,6 @@ function book(f){ return FISH_BOOK[FISH_ALIAS[f]||f] || {}; }
 
 /* ===== ここまでが Part 1/3 ===== */
 </script>
-```0
 <script>
 /* ===== Part 2/3：釣り場カテゴリごとの対応釣法 & 釣り場DB（東京都） ===== */
 
@@ -592,7 +615,27 @@ function setSteps(phase){
 
 function uniq(arr){ return Array.from(new Set(arr)); }
 function intersect(a,b){ const s=new Set(b); return a.filter(x=>s.has(x)); }
+const housebar = document.getElementById('housebar');
 
+function renderHouse(){
+  // 魚選択中ならその魚に合う記事、未選択ならデフォルト記事
+  const c = (typeof pickHouseCampaign==='function')
+      ? pickHouseCampaign(state.fish)
+      : null;
+
+  housebar.innerHTML = c ? `
+    <div class="card">
+      <div class="row" style="align-items:center;margin-bottom:8px">
+        <span class="prtag">PR</span><strong>${c.title}</strong>
+      </div>
+      ${c.img ? `<img class="banner" src="${c.img}" alt="campaign">` : ``}
+      <div class="muted" style="margin-top:6px">${c.text||''}</div>
+      <div class="row" style="margin-top:10px">
+        <a class="pri chip" target="_blank" href="${c.url}">特集を見る</a>
+      </div>
+    </div>
+  ` : '';
+                                        }
 function renderPref(){
   setSteps('pref');
   const prefs = uniq(DB.map(x=>x.pref));
@@ -847,11 +890,11 @@ async function sharePlan(){
 }
 
 function render(){
-  if(!state.pref) return renderPref();
-  if(!state.spot) return renderSpots();
-  if(state.zoneIdx==null) return renderZones();
-  if(!state.fish) return renderFish();
-  return renderRig();
+  if(!state.pref) { renderPref(); renderHouse(); return; }
+  if(!state.spot) { renderSpots(); renderHouse(); return; }
+  if(state.zoneIdx==null) { renderZones(); renderHouse(); return; }
+  if(!state.fish) { renderFish(); renderHouse(); return; }
+  renderRig(); renderHouse(); // 最終ページ
 }
 
 /* ====== LIFF 初期化 ====== */
