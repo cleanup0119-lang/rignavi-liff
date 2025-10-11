@@ -78,7 +78,7 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "52";
+const VERSION = "53";
 function withV(path){
   // 絶対URLも相対URLもOKにする
   if (!path) return "";
@@ -96,7 +96,10 @@ const HOUSE_CAMPAIGNS = [
     text:"これさえあれば堤防OK。編集部セレクト3点を公開中。",
     url:"https://your.site/rignavi/fall-sabiki?ref=house",
     img:"img/house/fall-sabiki.jpg",
-    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] },
+    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] 
+  date: "2025-09-28"         // ← 追加（新しいほど“最新”と判断）
+  },
+  
   { id:"rockfish-pack", title:"根魚スターター（夜間）",
     text:"胴突き×ブラクリ×常夜灯の攻め方を1ページで解説。",
     url:"https://your.site/rignavi/rockfish?ref=house",
@@ -634,24 +637,42 @@ function uniq(arr){ return Array.from(new Set(arr)); }
 function intersect(a,b){ const s=new Set(b); return a.filter(x=>s.has(x)); }
 const housebar = document.getElementById('housebar');
 
-function renderHouse(){
-  // 魚選択中ならその魚に合う記事、未選択ならデフォルト記事
-  const c = (typeof pickHouseCampaign==='function')
-      ? pickHouseCampaign(state.fish)
-      : null;
+// LIFF内で開く（Webプレビュー時は普通に遷移）
+function openCampaign(url){
+  try{
+    if (window.liff && liff.isLoggedIn()){
+      liff.openWindow({ url, external:false });
+      return false;
+    }
+  }catch(_){}
+  return true;
+}
 
-  housebar.innerHTML = c ? `
-    <div class="card">
-      <div class="row" style="align-items:center;margin-bottom:8px">
-        <span class="prtag">PR</span><strong>${c.title}</strong>
-      </div>
-      ${c.img ? `<img class="banner" src="${c.img}" alt="campaign">` : ``}
-      <div class="muted" style="margin-top:6px">${c.text||''}</div>
-      <div class="row" style="margin-top:10px">
-        <a class="pri chip" target="_blank" href="${c.url}">特集を見る</a>
-      </div>
+// 最上部のハウス広告（魚優先→最新、説明文なし、画像クリックで遷移）
+function renderHouse(){
+  const c = (typeof pickHouseCampaign==='function') ? pickHouseCampaign(state.fish) : null;
+  if(!c){ housebar.innerHTML = ''; return; }
+
+  const imgSrc = withV(c.img || ''); // ← VERSIONでキャッシュ回避
+
+  housebar.innerHTML = `
+    <div class="card" style="padding:0; overflow:hidden; border:2px solid #bfe9ff">
+      <a id="houseBannerLink"
+         href="${c.url || '#'}"
+         onclick="return openCampaign('${c.url || '#'}')"
+         style="display:block; text-decoration:none">
+        <div class="row" style="align-items:center; gap:8px; padding:10px 12px">
+          <span class="prtag">PR</span>
+          <strong>${c.title || ''}</strong>
+        </div>
+        ${c.img ? `<img id="houseBannerImg" class="banner"
+                        src="${imgSrc}"
+                        alt="${c.title || 'campaign'}"
+                        onerror="this.src='https://placehold.co/1200x360?text=campaign'">` : ``}
+      </a>
     </div>
-  ` : '';
+  `;
+}
                                         }
 function renderPref(){
   setSteps('pref');
