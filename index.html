@@ -78,7 +78,7 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "45";
+const VERSION = "46";
 
 /* ===== ユーティリティ ===== */
 function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\wぁ-んァ-ン一-龯ー]+/g,'-'); }
@@ -148,7 +148,7 @@ const BAIT_BY_METHOD = {
 
 /* ===== 画像（仮） ===== */
 const FISH_IMG_FALLBACK = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop";
-function fishImg(f){ return `img/fish-${toSlug(f)}.png`; }
+function fishImg(f){ return `img/fish-${toSlug(f)}.jpg`; }
 function rigImg(fish,method){
   const m = method||"";
   return {
