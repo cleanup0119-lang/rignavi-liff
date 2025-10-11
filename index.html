@@ -51,7 +51,7 @@
   .param b{font-weight:800;color:#055}
   .method-chips .chip.on{background:#e8f8ff;border:1px solid #bfe9ff;font-weight:700}
   .memo{font-size:13px;color:#174656;background:#f6fbff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px}
-#housebar .card{border:2px solid #bfe9ff}
+  #housebar .card{border:2px solid #bfe9ff}
   #housebar .prtag{font-size:12px;color:#0a4c63;background:#e8f8ff;border:1px solid #bfe9ff;border-radius:999px;padding:4px 8px;margin-right:6px}
   #housebar .banner{max-height:220px;object-fit:cover}
 </style>
@@ -64,9 +64,9 @@
 
 <main>
   <div id="hello">起動中…</div>
-  <!-- ▼ 追加：ハウス広告の固定表示コンテナ -->
+  <!-- ▼ ハウス広告の固定表示コンテナ -->
   <div id="housebar"></div>
-  
+
   <div class="row" style="justify-content:space-between">
     <div class="steps" id="steps"></div>
     <button id="back" class="ghost" hidden onclick="goBack()">戻る</button>
@@ -78,41 +78,59 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "54";
+const VERSION = "58";
 function withV(path){
-  // 絶対URLも相対URLもOKにする
   if (!path) return "";
   return path + (path.includes("?") ? "&" : "?") + "v=" + VERSION;
 }
+
 /* ===== ユーティリティ ===== */
 function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\wぁ-んァ-ン一-龯ー]+/g,'-'); }
 function q(s){ return encodeURIComponent(s); }
 function linkAmazon(keyword){ return `https://www.amazon.co.jp/s?k=${q(keyword)}&tag=YOURID-22`; }
 function linkRakuten(keyword){ return `https://search.rakuten.co.jp/search/mall/${q(keyword)}/?scid=af_pc_etc&icm_cid=YOUR_RAKUTEN_ID`; }
 
-// シーズン記事（必要に応じて増やす）
+/* ===== シーズン記事（ハウス広告） ===== */
 const HOUSE_CAMPAIGNS = [
   { id:"fall-sabiki", title:"秋のサビキ最強セット",
     text:"これさえあれば堤防OK。編集部セレクト3点を公開中。",
     url:"https://your.site/rignavi/fall-sabiki?ref=house",
     img:"img/house/fall-sabiki.jpg",
-    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] ,
-　　date: "2025-09-28"         // ← 追加（新しいほど“最新”と判断）
+    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"], date:"2025-09-28"
   },
-  
   { id:"rockfish-pack", title:"根魚スターター（夜間）",
     text:"胴突き×ブラクリ×常夜灯の攻め方を1ページで解説。",
     url:"https://your.site/rignavi/rockfish?ref=house",
     img:"https://placehold.co/1200x360?text=Rockfish+Pack",
-    targetFish:["カサゴ","メバル","アイナメ"] }
+    targetFish:["カサゴ","メバル","アイナメ"], date:"2025-09-10"
+  }
 ];
-// 魚に紐づく記事があればそちら、なければ先頭
+
+// 魚に紐づく最新 → なければ全体の最新
 function pickHouseCampaign(fish){
-  const f = FISH_ALIAS?.[fish] || fish;
-  return HOUSE_CAMPAIGNS.find(c => (c.targetFish||[]).includes(f)) || HOUSE_CAMPAIGNS[0] || null;
+  const list = HOUSE_CAMPAIGNS || [];
+  if (!list.length) return null;
+
+  const norm = x => (x||"").trim();
+  const fishKey = norm((typeof FISH_ALIAS!=='undefined' && FISH_ALIAS[fish]) || fish);
+
+  const latestOf = (arr)=>{
+    if (!arr.length) return null;
+    const withDate = arr.filter(a=>!!a.date);
+    return withDate.length
+      ? [...withDate].sort((a,b)=> new Date(b.date)-new Date(a.date))[0]
+      : arr[arr.length-1];
+  };
+
+  if (fishKey){
+    const hit = list.filter(c => (c.targetFish||[]).map(norm).includes(fishKey));
+    const pick = latestOf(hit);
+    if (pick) return pick;
+  }
+  return latestOf(list);
 }
 
-  
+// LIFF内で開く（Webプレビュー時は普通に遷移）
 function openCampaign(url){
   try{
     if (window.liff && liff.isLoggedIn()){
@@ -123,8 +141,9 @@ function openCampaign(url){
   return true;
 }
 
+// 最上部のハウス広告（魚優先→最新、画像クリックで遷移）
 function renderHouse(){
-  const c = (typeof pickHouseCampaign==='function') ? pickHouseCampaign(state.fish) : null;
+  const c = (typeof pickHouseCampaign==='function') ? pickHouseCampaign(state?.fish) : null;
   const bar = document.getElementById('housebar');
   if(!bar){ return; }
   if(!c){ bar.innerHTML=''; return; }
@@ -141,7 +160,7 @@ function renderHouse(){
       </a>
     </div>`;
 }
-  
+
 /* ===== 釣法→代表ギア語彙 ===== */
 const METHOD_GEAR = {
   "サビキ":["サビキ 仕掛け","トリックサビキ","サビキ用カゴ"],
@@ -195,7 +214,7 @@ function rigImg(fish,method){
   };
 }
 
-/* ===== 魚種データ（完全版） ===== */
+/* ===== 魚種データ（前半） ===== */
 const FISH_BOOK = {
   /* 小型回遊魚・ベイト系 */
   "豆アジ": { season:"初夏〜秋（6–11月）", time:"朝夕マズメ／夜の常夜灯", shelf:"表層〜中層（常夜灯直下は浅め）",
@@ -248,11 +267,16 @@ const FISH_BOOK = {
     methods:["ミャク釣り","ウキ","ちょい投げ","ハゼクラ"], bait:["アオイソメ","エビ身","ホタテ","イカ短"],
     lures:["小型クランク","1g前後ジグヘッド"], food:"天ぷら／唐揚げ／甘露煮" },
   "ウロハゼ": { season:"夏〜秋", time:"日中（潮位変化を意識）", shelf:"底（護岸キワ、捨石周り）",
-    methods:["ミャク釣り"], bait:["アオイソメ","エビ身"], lures:[], food:"唐揚げ／天ぷら" },
-
+    methods:["ミャク釣り"], bait:["アオイソメ","エビ身"], lures:[], food:"唐揚げ／天ぷら" }
+};
+</script>
+<script>
+/* ===== FISH_BOOK 追記（Part1で定義済みのオブジェクトへ追加） ===== */
+Object.assign(FISH_BOOK, {
   /* フラットフィッシュ */
   "ソゲ": { season:"初夏〜秋", time:"朝夕・濁り後", shelf:"底上〜1m（駆け上がり・払い出し）",
-    methods:["ルアー","泳がせ"], bait:["活ハゼ","小アジ"], lures:["ミノー","シンペン","ジグヘッド＋シャッド"], food:"唐揚げ／ムニエル" },
+    methods:["ルアー","泳がせ"], bait:["活ハゼ","小アジ"],
+    lures:["ミノー","シンペン","ジグヘッド＋シャッド"], food:"唐揚げ／ムニエル" },
   "ヒラメ": { season:"晩秋〜冬＋春", time:"朝夕・荒れ後の回復時", shelf:"底上1m以内（離岸流・地形変化・堤防際のヨレ）",
     methods:["泳がせ","ぶっこみ","ルアー"], bait:["活アジ/コノシロ/ハゼ","サバ切り身"],
     lures:["シンキングミノー","シンペン","ジグヘッド＋ワーム","メタル"], food:"刺身・昆布締め／ムニエル" },
@@ -328,12 +352,12 @@ const FISH_BOOK = {
     methods:["ミャク釣り","小ウキ"], bait:["イソメ小さめ","エビ身"], lures:[], food:"唐揚げ（小型は観察・推奨）" },
   "ソウギョ": { season:"春〜秋", time:"日中", shelf:"表層〜中層（草のある岸際）",
     methods:["ウキ","ミャク釣り"], bait:["レタス/草類/パン"], lures:[], food:"—（外来種・自治体ルール遵守）" }
-};
+});
 
 /* ★ 表記ゆれ吸収（ページ分離のため旧マッピングは変更） */
 const FISH_ALIAS = {
-  "シーバス（スズキ）":"スズキ",   // 表示は「シーバス（スズキ）」→解説は「スズキ」
-  "シーバス":"スズキ",             // 万一「シーバス」で入力された場合もカバー
+  "シーバス（スズキ）":"スズキ",
+  "シーバス":"スズキ",
   "ハゼ":"マハゼ",
   "アナゴ":"マアナゴ",
   "コチ":"マゴチ",
@@ -341,10 +365,7 @@ const FISH_ALIAS = {
 };
 function book(f){ return FISH_BOOK[FISH_ALIAS[f]||f] || {}; }
 
-/* ===== ここまでが Part 1/3 ===== */
-</script>
-<script>
-/* ===== Part 2/3：釣り場カテゴリごとの対応釣法 & 釣り場DB（東京都） ===== */
+/* ===== Part 2/3：場所カテゴリごとの対応釣法 & 釣り場DB（東京都） ===== */
 
 /* カテゴリ別：場所で使用可にしておく釣法プリセット */
 const M_BASE_GOGAN   = ["サビキ","ロケットサビキ","ウキ","小ウキ","ちょい投げ","投げ","ミャク釣り","胴突き","ブラクリ","ヘチ・落とし込み","ぶっこみ","フカセ","ルアー","ルアー(軽量)","ジギング","テンヤ","ワインド","エレベーター","エギング"];
@@ -354,8 +375,6 @@ const M_BASE_SURF    = ["ちょい投げ","投げ","ぶっこみ","ルアー","�
 
 /* 釣り場DB（東京都） */
 const DB = [
-  /* 既存＋修正：シーバス（スズキ）を含む箇所はフッコ・セイゴも併記 */
-
   /* 東京｜護岸 / 堤防（運河・ふ頭・人工磯を含む） */
   { id:"wakasu", pref:"東京都", city:"江東区", name:"若洲海浜公園（海釣り施設・人工磯）",
     address:"江東区若洲3丁目",
@@ -492,7 +511,7 @@ const DB = [
     memo:"足場高く落水リスク／赤エイ情報あり。"
   },
 
-  /* 東京｜川（中・下流の河川・運河・親水公園・水門・橋脚など） */
+  /* 東京｜川（中・下流） */
   { id:"kyunakagawa", pref:"東京都", city:"江東区/江戸川区", name:"旧中川（東大島駅〜中川大橋）",
     address:"東大島周辺",
     map:"https://maps.google.com/?q=%E6%97%A7%E4%B8%AD%E5%B7%9D%20%E6%9D%B1%E5%A4%A7%E5%B3%B6",
@@ -615,21 +634,20 @@ const DB = [
     memo:"釣り可エリアは限定／投げ・フルキャスト不可。アンダー主体で安全第一。"
   }
 ];
-
-/* ===== Part 2/3 ここまで ===== */
-                          </script>
+</script>
 <script>
-/* ===== Part 3/3：描画・遷移・LIFF初期化 ===== */
+/* ===== Part 3/4：描画・遷移・ハウス広告・共有 ===== */
 
-const app = document.getElementById('app');
+const app     = document.getElementById('app');
 const stepsEl = document.getElementById('steps');
 const backBtn = document.getElementById('back');
-const hello = document.getElementById('hello');
+const hello   = document.getElementById('hello');
+const housebar= document.getElementById('housebar');
 
 const state = { pref:null, spot:null, zoneIdx:null, fish:null, method:null };
-const hist = [];
+const hist  = [];
 
-function push() { hist.push(JSON.stringify(state)); }
+function push(){ hist.push(JSON.stringify(state)); }
 function goBack(){
   if(!hist.length) return;
   const prev = JSON.parse(hist.pop());
@@ -638,6 +656,7 @@ function goBack(){
 }
 window.goBack = goBack;
 
+/* 進行ステップの表示 */
 function setSteps(phase){
   const steps = [
     {id:"pref", label:"都道府県"},
@@ -646,32 +665,34 @@ function setSteps(phase){
     {id:"fish", label:"魚種"},
     {id:"rig",  label:"仕掛け"}
   ];
-  stepsEl.innerHTML = steps.map(s=>`<div class="step ${s.id===phase?'on':''}">${s.label}</div>`).join('');
+  stepsEl.innerHTML = steps.map(s=>`
+    <div class="step ${s.id===phase?'on':''}">${s.label}</div>
+  `).join('');
   backBtn.hidden = (hist.length===0);
 }
 
+/* 小ユーティリティ */
 function uniq(arr){ return Array.from(new Set(arr)); }
 function intersect(a,b){ const s=new Set(b); return a.filter(x=>s.has(x)); }
-const housebar = document.getElementById('housebar');
 
-// LIFF内で開く（Webプレビュー時は普通に遷移）
+/* LIFF内で開く（Webプレビュー時は通常遷移） */
 function openCampaign(url){
   try{
     if (window.liff && liff.isLoggedIn()){
       liff.openWindow({ url, external:false });
-      return false;
+      return false; // aタグのデフォルト遷移を止める
     }
   }catch(_){}
   return true;
 }
 
-// 最上部のハウス広告（魚優先→最新、説明文なし、画像クリックで遷移）
+/* 最上部のハウス広告（魚優先→最新） */
 function renderHouse(){
   const c = (typeof pickHouseCampaign==='function') ? pickHouseCampaign(state.fish) : null;
-  if(!c){ housebar.innerHTML = ''; return; }
+  if(!housebar){ return; }
+  if(!c){ housebar.innerHTML=''; return; }
 
-  const imgSrc = withV(c.img || ''); // ← VERSIONでキャッシュ回避
-
+  const imgSrc = withV(c.img || '');
   housebar.innerHTML = `
     <div class="card" style="padding:0; overflow:hidden; border:2px solid #bfe9ff">
       <a id="houseBannerLink"
@@ -679,8 +700,7 @@ function renderHouse(){
          onclick="return openCampaign('${c.url || '#'}')"
          style="display:block; text-decoration:none">
         <div class="row" style="align-items:center; gap:8px; padding:10px 12px">
-          <span class="prtag">PR</span>
-          <strong>${c.title || ''}</strong>
+          <span class="prtag">PR</span><strong>${c.title || ''}</strong>
         </div>
         ${c.img ? `<img id="houseBannerImg" class="banner"
                         src="${imgSrc}"
@@ -690,15 +710,15 @@ function renderHouse(){
     </div>
   `;
 }
-                                        }
+
+/* ===== 画面：都道府県 ===== */
 function renderPref(){
   setSteps('pref');
   const prefs = uniq(DB.map(x=>x.pref));
-  app.innerHTML = ` ... `;
-renderHouse();            // ← これを追加
+  app.innerHTML = `
     <div class="card hero">
       <h1>エリアを選ぶ</h1>
-      <div class="muted">まずは都道府県から。次に釣り場 → ポイント → 魚種の順で進みます。</div>
+      <div class="muted">まずは都道府県から。次に釣り場 → ポイント → 魚種 → 仕掛けの順で進みます。</div>
     </div>
     <div class="grid">
       ${prefs.map(p=>`
@@ -709,21 +729,22 @@ renderHouse();            // ← これを追加
       `).join('')}
     </div>
   `;
+  renderHouse();
 }
 window.pickPref = (p)=>{
   push();
-  state.pref = p; state.spot = null; state.zoneIdx=null; state.fish=null; state.method=null;
+  state.pref = p; state.spot=null; state.zoneIdx=null; state.fish=null; state.method=null;
   renderSpots();
 };
 
+/* ===== 画面：釣り場一覧 ===== */
 function renderSpots(){
   setSteps('spot');
   const list = DB.filter(x=>x.pref===state.pref);
-  app.innerHTML = ` ... `;
-  renderHouse(); // ← 追加
+  app.innerHTML = `
     <div class="card hero">
       <h1>${state.pref} の釣り場</h1>
-      <div class="muted">カードの「選ぶ」で進みます。<br>各カードには「一口メモ・注意事項」を表示しています。</div>
+      <div class="muted">各カードの「選ぶ」で進みます。カード下部に「一口メモ・注意事項」を表示しています。</div>
     </div>
     <div class="grid">
       ${list.map(s=>`
@@ -735,31 +756,32 @@ function renderSpots(){
           </div>
           <div class="memo">📝 ${s.memo||'—'}</div>
           <div class="row" style="margin-top:10px">
-            <a class="ghost chip" href="${s.map}" target="_blank">地図を開く</a>
+            <a class="ghost chip" href="${s.map}" target="_blank">📍 地図を開く</a>
             <button class="pri" onclick="pickSpot('${s.id}')">選ぶ</button>
           </div>
         </div>
       `).join('')}
     </div>
   `;
+  renderHouse();
 }
 window.pickSpot = (id)=>{
   push();
-  state.spot = DB.find(x=>x.id===id);
+  state.spot = DB.find(x=>x.id===id) || null;
   state.zoneIdx = null; state.fish=null; state.method=null;
-  if((state.spot?.zones||[]).length===1){
-    state.zoneIdx = 0;
-    renderFish();
+  if(!state.spot){ renderSpots(); return; }
+  if((state.spot.zones||[]).length===1){
+    state.zoneIdx = 0; renderFish();
   }else{
     renderZones();
   }
 };
 
+/* ===== 画面：ポイント種類（堤防/テトラ/サーフ/河口など） ===== */
 function renderZones(){
   setSteps('zone');
-  const z = state.spot.zones;
-  app.innerHTML = ` ... `;
-renderHouse();            // ← これを追加
+  const z = state.spot.zones || [];
+  app.innerHTML = `
     <div class="card hero">
       <h1>${state.spot.name} のポイント種類</h1>
       <div class="muted">堤防／テトラ／サーフ／河口などから選んでください。</div>
@@ -768,12 +790,13 @@ renderHouse();            // ← これを追加
       ${z.map((zz,i)=>`
         <div class="card">
           <h3>${zz.type}</h3>
-          <div class="kv">${zz.fishes.map(f=>`<span>${f}</span>`).join('')}</div>
+          <div class="kv">${(zz.fishes||[]).map(f=>`<span>${f}</span>`).join('')}</div>
           <button class="pri" onclick="pickZone(${i})">このポイントを選ぶ</button>
         </div>
       `).join('')}
     </div>
   `;
+  renderHouse();
 }
 window.pickZone = (i)=>{
   push();
@@ -781,10 +804,11 @@ window.pickZone = (i)=>{
   renderFish();
 };
 
+/* ===== 画面：魚種選択 ===== */
 function renderFish(){
   setSteps('fish');
   const zone = state.spot.zones[state.zoneIdx];
-  const fishes = uniq(zone.fishes);
+  const fishes = uniq(zone.fishes||[]);
   app.innerHTML = `
     <div class="card hero">
       <h1>魚種を選ぶ</h1>
@@ -795,14 +819,15 @@ function renderFish(){
         <div class="card">
           <h3>${f}</h3>
           <div class="params">
-            ${(book(f).season?`<span class="param"><b>季節</b> ${book(f).season}</span>`:'')}
-            ${(book(f).time?`<span class="param"><b>時間帯</b> ${book(f).time}</span>`:'')}
+            ${(book(f).season?`<span class="param"><b>シーズン</b> ${book(f).season}</span>`:'')}
+            ${(book(f).time?  `<span class="param"><b>時間帯</b> ${book(f).time}</span>`  :'')}
           </div>
           <button class="pri" onclick="pickFish('${f.replace(/'/g,"\\'")}')">この魚を狙う</button>
         </div>
       `).join('')}
     </div>
   `;
+  renderHouse();
 }
 window.pickFish = (f)=>{
   push();
@@ -810,31 +835,36 @@ window.pickFish = (f)=>{
   renderRig();
 };
 
+/* この場所でその魚に使える釣法を自動フィルタ */
 function allowedMethodsFor(fish){
-  const zone = state.spot.zones[state.zoneIdx];
+  const base = (state.spot && state.spot.methods) ? state.spot.methods : [];
   const fishInfo = book(fish);
-  const base = zone ? state.spot.methods : [];
-  // 場所 × 魚のインターセクション（できない釣法は自動で非表示）
   let allowed = intersect(base, fishInfo.methods||[]);
-  // 追加の気遣い：カサゴ・メバルなど根魚で「ルアー」選択時にロック系も候補扱い
+  // 根魚ケア：ルアー可の場所で魚側にルアーが入っていないときは候補に追加
   if((/カサゴ|アイナメ|メバル/).test(fish) && base.includes("ルアー") && !allowed.includes("ルアー")){
     allowed.push("ルアー");
   }
   return uniq(allowed);
 }
 
+/* ===== 画面：仕掛けページ ===== */
 function renderRig(){
   setSteps('rig');
+
   const zone = state.spot.zones[state.zoneIdx];
   const fish = state.fish;
-  const b = book(fish);
+  const b    = book(fish);
   const methods = allowedMethodsFor(fish);
+
   if(!methods.length){
     app.innerHTML = `
-      <div class="card hero"><h1>${fish}</h1>
-      <div class="muted">このポイントでは推奨できる釣り方が見つかりませんでした。</div></div>
+      <div class="card hero">
+        <h1>${fish}</h1>
+        <div class="muted">このポイントでは推奨できる釣り方が見つかりませんでした。</div>
+      </div>
       <div class="card"><button class="ghost" onclick="goBack()">戻る</button></div>
     `;
+    renderHouse();
     return;
   }
   if(!state.method) state.method = methods[0];
@@ -844,16 +874,16 @@ function renderRig(){
 
   const params = [
     b.season?`<span class="param"><b>シーズン</b> ${b.season}</span>`:"",
-    b.time?`<span class="param"><b>時間帯</b> ${b.time}</span>`:"",
-    b.shelf?`<span class="param"><b>棚</b> ${b.shelf}</span>`:""
+    b.time?  ` <span class="param"><b>時間帯</b> ${b.time}</span>`:"",
+    b.shelf? ` <span class="param"><b>棚</b> ${b.shelf}</span>`:""
   ].join('');
 
   // 部材（メソッド基準＋魚基準）
   const gearKeywords = uniq([...(METHOD_GEAR[state.method]||[]), ...((b.gear)||[])]);
   // 餌・撒き餌
-  const baitList = uniq([...(b.bait||[]), ...(BAIT_BY_METHOD[state.method]||[])]);
+  const baitList  = uniq([...(b.bait||[]), ...(BAIT_BY_METHOD[state.method]||[])]);
   // ルアー
-  const lureList = uniq([...(b.lures||[])]);
+  const lureList  = uniq([...(b.lures||[])]);
 
   app.innerHTML = `
     <div class="card hero">
@@ -864,41 +894,50 @@ function renderRig(){
 
     <div class="card">
       <h3>指定した魚画像</h3>
-      <img class="banner" src="${fishImageUrl}" onerror="this.src='${FISH_IMG_FALLBACK}'" alt="${fish}">
+      <img class="banner" src="${fishImageUrl}"
+           onerror="this.src='${FISH_IMG_FALLBACK}'" alt="${fish}">
       <div class="cap">※画像はダミーです。<code>img/fish-${toSlug(fish)}.png</code> を置くと差し替わります。</div>
     </div>
 
     <div class="card">
       <h3>仕掛けイラスト（${state.method}）</h3>
       <img class="banner" src="${rigImgs.specific}"
-           onerror="this.onerror=null;this.src='${rigImgs.generic}';this.onerror=()=>{this.src='${rigImgs.placeholder}'}" alt="rig">
+           onerror="this.onerror=null;this.src='${rigImgs.generic}';this.onerror=()=>{this.src='${rigImgs.placeholder}'}"
+           alt="rig">
       <div class="cap">※<code>img/rig-${toSlug(fish)}-${toSlug(state.method)}.png</code> が無い場合は
         <code>img/rig-${toSlug(state.method)}.png</code> → プレースホルダの順に表示します。</div>
+
       <div class="sectionTitle">釣り方を切り替える</div>
       <div class="chips method-chips">
-        ${methods.map(m=>`<button class="chip ${m===state.method?'on':''}" onclick="setMethod('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
+        ${methods.map(m=>`
+          <button class="chip ${m===state.method?'on':''}"
+                  onclick="setMethod('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
       </div>
     </div>
 
     <div class="card">
       <h3>オススメ部材</h3>
-      ${gearKeywords.length? `<ul class="items">`+gearKeywords.map(k=>`
-          <li>
-            ${k}
-            <div class="shops">
-              <a class="shop" target="_blank" href="${linkAmazon(k)}">Amazon</a>
-              <a class="shop" target="_blank" href="${linkRakuten(k)}">楽天</a>
-            </div>
-          </li>`).join('')+`</ul>` : `<div class="muted">この釣り方の代表的な部材が見つかりませんでした。</div>`}
+      ${gearKeywords.length ? `
+        <ul class="items">
+          ${gearKeywords.map(k=>`
+            <li>
+              ${k}
+              <div class="shops">
+                <a class="shop" target="_blank" href="${linkAmazon(k)}">Amazon</a>
+                <a class="shop" target="_blank" href="${linkRakuten(k)}">楽天</a>
+              </div>
+            </li>`).join('')}
+        </ul>` : `<div class="muted">この釣り方の代表的な部材が見つかりませんでした。</div>`
+      }
     </div>
 
     <div class="card">
       <h3>餌・コマセ（& 補助）</h3>
-      ${baitList.length? `<ul class="items">`+baitList.map(x=>`<li>${x}</li>`).join('')+`</ul>` : `<div class="muted">—</div>`}
-      ${lureList.length? `
+      ${baitList.length ? `<ul class="items">`+baitList.map(x=>`<li>${x}</li>`).join('')+`</ul>` : `<div class="muted">—</div>`}
+      ${lureList.length ? `
         <div class="sectionTitle">ルアー候補</div>
-        <ul class="items">`+lureList.map(x=>`<li>${x}</li>`).join('')+`</ul>
-      `:""}
+        <ul class="items">`+lureList.map(x=>`<li>${x}</li>`).join('')+`</ul>` : ``
+      }
     </div>
 
     <div class="card">
@@ -919,14 +958,16 @@ function renderRig(){
       <div class="cap">※共有テキストに 釣り場／ポイント／魚種／釣り方／地図URL を含めます。</div>
     </div>
   `;
+  renderHouse();
 }
 
 window.setMethod = (m)=>{ push(); state.method = m; renderRig(); };
 
+/* 共有（LIFFが使えないWebプレビュー時はクリップボードへ） */
 async function sharePlan(){
   try{
     const zone = state.spot.zones[state.zoneIdx];
-    const url = state.spot.map;
+    const url  = state.spot.map;
     const txt = [
       `🎣 RigNavi プラン共有`,
       `場所: ${state.spot.name}（${zone.type}）`,
@@ -936,10 +977,11 @@ async function sharePlan(){
       `棚: ${book(state.fish).shelf||'-'}`,
       `地図: ${url}`
     ].join('\n');
+
     if(window.liff && liff.isApiAvailable('shareTargetPicker')){
       await liff.shareTargetPicker([{ type:'text', text: txt }]);
     }else{
-      alert("LINEアプリ外のため、共有APIが使えません。テキストをコピーします。\n\n"+txt);
+      alert("LINEアプリ外のため共有APIが使えません。テキストをコピーします。\n\n"+txt);
       await navigator.clipboard.writeText(txt);
     }
   }catch(e){
@@ -947,25 +989,32 @@ async function sharePlan(){
   }
 }
 
+/* ルート描画 */
 function render(){
-  if(!state.pref) { renderPref(); renderHouse(); return; }
-  if(!state.spot) { renderSpots(); renderHouse(); return; }
-  if(state.zoneIdx==null) { renderZones(); renderHouse(); return; }
-  if(!state.fish) { renderFish(); renderHouse(); return; }
-  renderRig(); renderHouse(); // 最終ページ
+  if(!state.pref){ renderPref(); return; }
+  if(!state.spot){ renderSpots(); return; }
+  if(state.zoneIdx==null){ renderZones(); return; }
+  if(!state.fish){ renderFish(); return; }
+  renderRig();
 }
-
-/* ====== LIFF 初期化 ====== */
+</script>
+<script>
+/* ===== Part 4/4：LIFF 初期化 & 起動 ===== */
 (async ()=>{
   try{
     await liff.init({ liffId: LIFF_ID });
-    if(!liff.isLoggedIn()){ liff.login(); return; }
+    if(!liff.isLoggedIn()){
+      // LINE アプリ内ならログインへ。外部ブラウザでは例外になる場合がある
+      liff.login();
+      return;
+    }
     const p = await liff.getProfile();
     hello.textContent = `ようこそ ${p.displayName} さん`;
-  }catch(_){
-    // Webプレビュー用フォールバック
+  }catch(_e){
+    // Webプレビュー（LINE外）用のフォールバック表示
     hello.textContent = "Webプレビュー（LINE外で実行中）";
   }finally{
+    // ルート描画スタート
     render();
   }
 })();
