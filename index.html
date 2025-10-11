@@ -78,7 +78,7 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "53";
+const VERSION = "54";
 function withV(path){
   // 絶対URLも相対URLもOKにする
   if (!path) return "";
@@ -96,8 +96,8 @@ const HOUSE_CAMPAIGNS = [
     text:"これさえあれば堤防OK。編集部セレクト3点を公開中。",
     url:"https://your.site/rignavi/fall-sabiki?ref=house",
     img:"img/house/fall-sabiki.jpg",
-    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] 
-  date: "2025-09-28"         // ← 追加（新しいほど“最新”と判断）
+    targetFish:["アジ","豆アジ","イワシ","サッパ","コハダ","コノシロ"] ,
+　　date: "2025-09-28"         // ← 追加（新しいほど“最新”と判断）
   },
   
   { id:"rockfish-pack", title:"根魚スターター（夜間）",
@@ -113,17 +113,34 @@ function pickHouseCampaign(fish){
 }
 
   
-// 例： houseBannerImg がハウス広告の <img> 要素
-const house = pickHouseCampaign(selectedFish) || HOUSE_CAMPAIGNS[0];
-const imgEl = document.getElementById("houseBannerImg");
-imgEl.alt = "campaign";
-imgEl.onerror = () => { imgEl.src = "https://placehold.co/1200x360?text=campaign"; };
-// ★ ここをキャッシュバスター付きに
-imgEl.src = withV(house.img);
+function openCampaign(url){
+  try{
+    if (window.liff && liff.isLoggedIn()){
+      liff.openWindow({ url, external:false });
+      return false;
+    }
+  }catch(_){}
+  return true;
+}
 
-const houseLink = document.getElementById("houseBannerLink");
-houseLink.href = house.url || "#";
+function renderHouse(){
+  const c = (typeof pickHouseCampaign==='function') ? pickHouseCampaign(state.fish) : null;
+  const bar = document.getElementById('housebar');
+  if(!bar){ return; }
+  if(!c){ bar.innerHTML=''; return; }
 
+  const imgSrc = withV(c.img || '');
+  bar.innerHTML = `
+    <div class="card" style="padding:0; overflow:hidden; border:2px solid #bfe9ff">
+      <a href="${c.url||'#'}" onclick="return openCampaign('${c.url||'#'}')" style="display:block; text-decoration:none">
+        <div class="row" style="align-items:center; gap:8px; padding:10px 12px">
+          <span class="prtag">PR</span><strong>${c.title||''}</strong>
+        </div>
+        ${c.img ? `<img class="banner" src="${imgSrc}" alt="${c.title||'campaign'}"
+                 onerror="this.src='https://placehold.co/1200x360?text=campaign'">` : ``}
+      </a>
+    </div>`;
+}
   
 /* ===== 釣法→代表ギア語彙 ===== */
 const METHOD_GEAR = {
@@ -677,7 +694,8 @@ function renderHouse(){
 function renderPref(){
   setSteps('pref');
   const prefs = uniq(DB.map(x=>x.pref));
-  app.innerHTML = `
+  app.innerHTML = ` ... `;
+renderHouse();            // ← これを追加
     <div class="card hero">
       <h1>エリアを選ぶ</h1>
       <div class="muted">まずは都道府県から。次に釣り場 → ポイント → 魚種の順で進みます。</div>
@@ -701,7 +719,8 @@ window.pickPref = (p)=>{
 function renderSpots(){
   setSteps('spot');
   const list = DB.filter(x=>x.pref===state.pref);
-  app.innerHTML = `
+  app.innerHTML = ` ... `;
+  renderHouse(); // ← 追加
     <div class="card hero">
       <h1>${state.pref} の釣り場</h1>
       <div class="muted">カードの「選ぶ」で進みます。<br>各カードには「一口メモ・注意事項」を表示しています。</div>
@@ -739,7 +758,8 @@ window.pickSpot = (id)=>{
 function renderZones(){
   setSteps('zone');
   const z = state.spot.zones;
-  app.innerHTML = `
+  app.innerHTML = ` ... `;
+renderHouse();            // ← これを追加
     <div class="card hero">
       <h1>${state.spot.name} のポイント種類</h1>
       <div class="muted">堤防／テトラ／サーフ／河口などから選んでください。</div>
