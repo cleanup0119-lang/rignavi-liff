@@ -78,8 +78,12 @@
 <script>
 /* ===== 基本設定 ===== */
 const LIFF_ID = "2008257307-RwPLYWG1";
-const VERSION = "50";
-
+const VERSION = "51";
+function withV(path){
+  // 絶対URLも相対URLもOKにする
+  if (!path) return "";
+  return path + (path.includes("?") ? "&" : "?") + "v=" + VERSION;
+}
 /* ===== ユーティリティ ===== */
 function toSlug(s){ return (s||'').toString().toLowerCase().replace(/[^\wぁ-んァ-ン一-龯ー]+/g,'-'); }
 function q(s){ return encodeURIComponent(s); }
@@ -105,6 +109,19 @@ function pickHouseCampaign(fish){
   return HOUSE_CAMPAIGNS.find(c => (c.targetFish||[]).includes(f)) || HOUSE_CAMPAIGNS[0] || null;
 }
 
+  
+// 例： houseBannerImg がハウス広告の <img> 要素
+const house = pickHouseCampaign(selectedFish) || HOUSE_CAMPAIGNS[0];
+const imgEl = document.getElementById("houseBannerImg");
+imgEl.alt = "campaign";
+imgEl.onerror = () => { imgEl.src = "https://placehold.co/1200x360?text=campaign"; };
+// ★ ここをキャッシュバスター付きに
+imgEl.src = withV(house.img);
+
+const houseLink = document.getElementById("houseBannerLink");
+houseLink.href = house.url || "#";
+
+  
 /* ===== 釣法→代表ギア語彙 ===== */
 const METHOD_GEAR = {
   "サビキ":["サビキ 仕掛け","トリックサビキ","サビキ用カゴ"],
